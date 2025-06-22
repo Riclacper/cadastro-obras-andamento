@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, TouchableOpacity, Image, ActivityIndicator, StyleSheet } from "react-native";
+import React, { useEffect, useState, useCallback } from "react";
+import { View, Text, FlatList, TouchableOpacity, Image, ActivityIndicator, StyleSheet, RefreshControl } from "react-native";
 import { useRouter } from "expo-router";
 
 interface Obra {
@@ -18,6 +18,7 @@ const API_URL = "http://192.168.0.102:5000"; // Substitua pelo IP do seu backend
 export default function ListaObras() {
   const [obras, setObras] = useState<Obra[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const router = useRouter();
 
   async function fetchObras() {
@@ -32,6 +33,12 @@ export default function ListaObras() {
       setLoading(false);
     }
   }
+
+  // Função para refresh puxando com o dedo
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchObras().then(() => setRefreshing(false));
+  }, []);
 
   useEffect(() => {
     fetchObras();
@@ -72,6 +79,9 @@ export default function ListaObras() {
           renderItem={renderObra}
           ListEmptyComponent={<Text>Nenhuma obra cadastrada.</Text>}
           contentContainerStyle={{ paddingBottom: 40 }}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
         />
       )}
 

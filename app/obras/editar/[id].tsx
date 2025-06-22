@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TextInput, Button, Image, ScrollView, Alert, TouchableOpacity, ActivityIndicator } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Image, Alert, ScrollView, ActivityIndicator } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
 import { ddmmToIso, isoToDdmm } from "../../../utils/formatDate";
+import Header from "../../../components/Header";
+import { StyleSheet } from "react-native";
 
 interface Localizacao {
   lat: number;
@@ -18,7 +20,7 @@ interface ObraPayload {
   descricao: string;
   foto: string;
 }
-const API_URL = "http://192.168.0.102:5000"; // Coloque o IP do backend
+const API_URL = "http://192.168.0.102:5000"; // Altere para seu backend
 
 export default function EditarObra() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -67,7 +69,7 @@ export default function EditarObra() {
       allowsEditing: true,
       aspect: [4, 3],
     });
-    if (!result.cancelled && result.assets && result.assets[0].base64) {
+    if (!result.canceled && result.assets && result.assets[0].base64) {
       setFoto(`data:image/jpeg;base64,${result.assets[0].base64}`);
     }
   }
@@ -125,35 +127,68 @@ export default function EditarObra() {
   }
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 20, backgroundColor: "#f3f3f3", flexGrow: 1 }}>
-      <Text style={{ fontWeight: "bold", fontSize: 22, marginBottom: 16 }}>Editar Obra</Text>
-      <Text>Nome da obra *</Text>
+    <ScrollView contentContainerStyle={{ padding: 20, backgroundColor: "#f5f6fa", flexGrow: 1 }}>
+      <Header />
+      <Text style={styles.titulo}>Editar Obra</Text>
+      <Text style={styles.label}>Nome da obra *</Text>
       <TextInput value={nome} onChangeText={setNome} style={styles.input} />
-      <Text>Responsável *</Text>
+      <Text style={styles.label}>Responsável *</Text>
       <TextInput value={responsavel} onChangeText={setResponsavel} style={styles.input} />
-      <Text>Data de início *</Text>
+      <Text style={styles.label}>Data de início *</Text>
       <TextInput value={dataInicio} onChangeText={setDataInicio} placeholder="DD-MM-YYYY" style={styles.input} />
-      <Text>Data de término *</Text>
+      <Text style={styles.label}>Data de término *</Text>
       <TextInput value={dataFim} onChangeText={setDataFim} placeholder="DD-MM-YYYY" style={styles.input} />
-      <Text>Descrição *</Text>
+      <Text style={styles.label}>Descrição *</Text>
       <TextInput value={descricao} onChangeText={setDescricao} multiline numberOfLines={3} style={styles.input} />
-      <Text>Foto da Obra</Text>
+      <Text style={styles.label}>Foto da Obra</Text>
       <TouchableOpacity onPress={pickImage} style={styles.button}>
-        <Text>{foto ? "Trocar foto" : "Tirar foto"}</Text>
+        <Text style={styles.buttonText}>{foto ? "Trocar foto" : "Tirar foto"}</Text>
       </TouchableOpacity>
-      {foto ? <Image source={{ uri: foto }} style={{ width: 220, height: 150, borderRadius: 8, marginBottom: 12 }} /> : null}
-      <Text>Localização (GPS)</Text>
+      {foto ? <Image source={{ uri: foto }} style={{ width: 220, height: 150, borderRadius: 8, marginBottom: 12, alignSelf: "center" }} /> : null}
+      <Text style={styles.label}>Localização (GPS)</Text>
       <TouchableOpacity onPress={obterLocalizacao} style={styles.button}>
-        <Text>Obter localização atual</Text>
+        <Text style={styles.buttonText}>Obter localização atual</Text>
       </TouchableOpacity>
       {localizacao.lat !== 0 && (
-        <Text>Lat: {localizacao.lat.toFixed(5)} | Long: {localizacao.long.toFixed(5)}</Text>
+        <Text style={{ marginBottom: 14, textAlign: "center" }}>
+          Lat: {localizacao.lat.toFixed(5)} | Long: {localizacao.long.toFixed(5)}
+        </Text>
       )}
-      <Button title={salvando ? "Salvando..." : "Salvar alterações"} onPress={atualizarObra} disabled={salvando} color="#27ae60" />
+      <TouchableOpacity style={styles.button} onPress={atualizarObra} disabled={salvando}>
+        <Text style={styles.buttonText}>{salvando ? "Salvando..." : "Salvar alterações"}</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 }
-const styles = {
-  input: { borderWidth: 1, borderColor: "#222", padding: 10, marginBottom: 10, backgroundColor: "#fff", color: "#222" },
-  button: { marginBottom: 12, backgroundColor: "#eee", padding: 10, alignItems: "center" }
-};
+const styles = StyleSheet.create({
+  input: {
+    borderWidth: 1,
+    borderColor: "#27ae60",
+    padding: 12,
+    marginBottom: 14,
+    backgroundColor: "#fff",
+    color: "#222",
+    borderRadius: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  button: {
+    marginBottom: 14,
+    backgroundColor: "#27ae60",
+    padding: 14,
+    alignItems: "center",
+    borderRadius: 8,
+  },
+  buttonText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
+  titulo: {
+    fontWeight: "bold",
+    fontSize: 24,
+    color: "#2980b9",
+    marginBottom: 18,
+    textAlign: "center"
+  },
+  label: { fontWeight: "bold", color: "#222", marginBottom: 4 }
+});
