@@ -1,6 +1,7 @@
 # 📱 Cadastro de Obras em Andamento – App Mobile
 
-Aplicativo em **React Native + Expo + TypeScript** para cadastro, acompanhamento e fiscalização de obras públicas. Permite registrar obras, fiscalizações, anexar fotos, localização por GPS e enviar relatórios por e-mail.
+Aplicativo em **React Native + Expo + TypeScript** para cadastro, acompanhamento e fiscalização de obras públicas.  
+Permite registrar obras, fiscalizações, anexar fotos, localização por GPS, e enviar relatórios por e-mail.
 
 ---
 
@@ -10,7 +11,8 @@ Aplicativo em **React Native + Expo + TypeScript** para cadastro, acompanhamento
 - React Native
 - TypeScript
 - @react-native-picker/picker
-- expo-image-picker, expo-location
+- expo-image-picker, expo-location, expo-router
+- react-native-progress
 - Integração com backend Node.js + MongoDB via REST API
 
 ---
@@ -46,19 +48,23 @@ const API_URL = "http://SEU_IP_LOCAL:5000"
 npx expo start
 ```
 
-* Escaneie o QR code com o **Expo Go** no seu celular (ambos precisam estar no mesmo Wi-Fi).
+* Faça login no **Expo Go** do seu celular com a mesma conta Expo.
+* O projeto aparece em “Projetos” no Expo Go, basta tocar (sem precisar escanear QR code, se estiver logado).
+* Ou use o QR code normalmente.
 
 ---
 
 ## 🛠️ Funcionalidades
 
-* **Cadastro de Obras**: nome, responsável, datas, descrição, foto (câmera), localização via GPS.
-* **Listagem de Obras**: visualização das obras cadastradas.
-* **Detalhes da Obra**: dados completos, foto, localização, fiscalizações associadas.
-* **Cadastro e edição de Fiscalizações**: data, status, observações, foto, localização, obra vinculada.
-* **Envio de relatório por e-mail**: envia todos os dados para o endereço escolhido.
+* **Splash personalizada** com logo e barra de progresso animada.
+* **Cadastro de Obras:** nome, responsável, datas, descrição, foto (câmera), localização via GPS.
+* **Listagem de Obras:** com “pull to refresh” (puxar para atualizar) e botão flutuante para adicionar nova.
+* **Detalhes da Obra:** dados completos, foto, localização, fiscalizações associadas.
+* **Cadastro e edição de Fiscalizações:** data, status, observações, foto, localização, obra vinculada.
+* **Envio de relatório por e-mail:** envia todos os dados para o endereço escolhido.
+* **Visual moderno e responsivo, com botões arredondados e ícones.**
+* **Compatível com tema claro e escuro.**
 * **Fluxo 100% integrado ao backend**.
-* **Compatível com tema claro e escuro**.
 
 ---
 
@@ -67,18 +73,24 @@ npx expo start
 ```
 app/
   ├── obras/
-  │     ├── index.tsx
-  │     ├── nova.tsx
-  │     ├── [id].tsx
-  │     └── editar/[id].tsx
+  │     ├── index.tsx         # Listagem de obras (com refresh)
+  │     ├── nova.tsx          # Cadastro de obra
+  │     ├── [id].tsx          # Detalhes da obra
+  │     └── editar/[id].tsx   # Edição de obra
   ├── fiscalizacoes/
-  │     ├── nova.tsx
-  │     ├── editar/[id].tsx
-  │     └── [id].tsx (opcional)
+  │     ├── index.tsx         # Listagem de fiscalizações (com refresh)
+  │     ├── nova.tsx          # Cadastro de fiscalização
+  │     ├── editar/[id].tsx   # Edição de fiscalização
+  │     └── [id].tsx          # Detalhes da fiscalização
   ├── components/
+  │     └── Header.tsx        # Componente da logo
   ├── assets/
+  │     └── images/logo.png   # Logo do app
   ├── utils/
-  │     └── formatDate.ts
+  │     └── formatDate.ts     # Funções para datas
+  ├── SplashScreen.tsx        # Splash personalizada com barra
+  ├── index.tsx               # Exporta SplashScreen como tela inicial
+  ├── (tabs)/                 # Rotas de abas do app
   ...
 ```
 
@@ -86,24 +98,27 @@ app/
 
 ## 💡 Observações
 
-* **Datas**: preencha sempre como `DD-MM-YYYY` ou `DD/MM/YYYY` (app converte automaticamente para ISO).
-* **Permissões**: o app solicita acesso à câmera e localização quando necessário.
-* **API Backend**: o app espera que o backend (Node.js/MongoDB) esteja rodando e acessível na mesma rede.
+* **Datas:** preencha sempre como `DD-MM-YYYY` ou `DD/MM/YYYY` (app converte automaticamente para ISO).
+* **Permissões:** o app solicita acesso à câmera e localização quando necessário.
+* **API Backend:** o app espera que o backend (Node.js/MongoDB) esteja rodando e acessível na mesma rede.
+* **Atualização das listas:** basta puxar para baixo para atualizar as obras ou fiscalizações.
 
 ---
 
 ## 📸 Prints de Telas
 
-> Inclua aqui prints das principais telas do app: cadastro, listagem, detalhes, envio de e-mail, etc.
+> Inclua prints das principais telas: splash personalizada, cadastro, listagem, detalhes, envio de e-mail, etc.
 
 ---
 
 ## 👨‍💻 Autor
 
 Desenvolvido por **Ricardo Lacerda**
+Orientação acadêmica: **Geraldo Gomes**
 
 ---
 
 ## 📚 Licença
 
 Este projeto é para fins acadêmicos e didáticos.
+
