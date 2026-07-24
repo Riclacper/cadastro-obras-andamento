@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image, Alert, ScrollView, ActivityIndicator } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Image, Alert, ScrollView, ActivityIndicator, Modal } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
@@ -20,6 +20,7 @@ interface ObraPayload {
   localizacao: Localizacao;
   descricao: string;
   foto: string;
+  status: string;
 }
 export default function EditarObra() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -33,6 +34,9 @@ export default function EditarObra() {
   const [descricao, setDescricao] = useState("");
   const [foto, setFoto] = useState<string>("");
   const [localizacao, setLocalizacao] = useState<Localizacao>({ lat: 0, long: 0 });
+  const [status, setStatus] = useState("Em andamento");
+  const [selectingStatus, setSelectingStatus] = useState(false);
+  const statusOptions = ["Planejada", "Em andamento", "Concluída", "Pausada"];
 
   useEffect(() => {
     async function fetchObra() {
@@ -46,6 +50,7 @@ export default function EditarObra() {
         setDescricao(data.descricao || "");
         setFoto(data.foto || "");
         setLocalizacao(data.localizacao || { lat: 0, long: 0 });
+        setStatus(data.status || "Em andamento");
       } catch {
         Alert.alert("Erro ao carregar dados da obra.");
         router.back();
@@ -108,6 +113,7 @@ export default function EditarObra() {
       localizacao,
       descricao,
       foto,
+      status,
     };
     try {
       const res = await apiFetch(`/obras/${id}`, {
@@ -146,6 +152,17 @@ export default function EditarObra() {
       <TextInput value={dataFim} onChangeText={(value) => setDataFim(maskDdmm(value))} placeholder="DD/MM/AAAA" keyboardType="number-pad" maxLength={10} style={styles.input} />
       <Text style={styles.label}>Descrição *</Text>
       <TextInput value={descricao} onChangeText={setDescricao} multiline numberOfLines={3} style={styles.input} />
+      <Text style={styles.label}>Status da obra *</Text>
+      <TouchableOpacity style={styles.selectField} onPress={() => setSelectingStatus(true)}>
+        <Text style={styles.selectValue}>{status}</Text><Text style={styles.chevron}>⌄</Text>
+      </TouchableOpacity>
+      <Modal visible={selectingStatus} transparent animationType="slide" onRequestClose={() => setSelectingStatus(false)}>
+        <View style={styles.modalBackdrop}><View style={styles.modalCard}>
+          <Text style={styles.modalTitle}>Status da obra</Text>
+          {statusOptions.map((item) => <TouchableOpacity key={item} style={styles.option} onPress={() => { setStatus(item); setSelectingStatus(false); }}><Text style={styles.optionText}>{item}</Text>{item === status && <Text style={styles.check}>✓</Text>}</TouchableOpacity>)}
+          <TouchableOpacity style={styles.cancelButton} onPress={() => setSelectingStatus(false)}><Text style={styles.cancelText}>Cancelar</Text></TouchableOpacity>
+        </View></View>
+      </Modal>
       <Text style={styles.label}>Foto da Obra</Text>
       <TouchableOpacity onPress={pickImage} style={styles.button}>
         <Text style={styles.buttonText}>{foto ? "Trocar foto" : "Tirar foto"}</Text>
@@ -196,5 +213,16 @@ const styles = StyleSheet.create({
     marginBottom: 18,
     textAlign: "center"
   },
-  label: { fontWeight: "bold", color: "#222", marginBottom: 4 }
+  label: { fontWeight: "bold", color: "#222", marginBottom: 4 },
+  selectField: { alignItems: "center", backgroundColor: "#fff", borderColor: "#27ae60", borderRadius: 8, borderWidth: 1, flexDirection: "row", justifyContent: "space-between", marginBottom: 14, minHeight: 52, paddingHorizontal: 14 },
+  selectValue: { color: "#222", fontSize: 16 },
+  chevron: { color: "#147A50", fontSize: 22 },
+  modalBackdrop: { backgroundColor: "#00000066", flex: 1, justifyContent: "flex-end" },
+  modalCard: { backgroundColor: "#fff", borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 22 },
+  modalTitle: { color: "#183B56", fontSize: 20, fontWeight: "800", marginBottom: 14 },
+  option: { alignItems: "center", borderBottomColor: "#E2ECE7", borderBottomWidth: 1, flexDirection: "row", justifyContent: "space-between", paddingVertical: 16 },
+  optionText: { color: "#183B56", fontSize: 16, fontWeight: "600" },
+  check: { color: "#1F9D68", fontSize: 20, fontWeight: "800" },
+  cancelButton: { alignItems: "center", backgroundColor: "#E7F6EE", borderRadius: 10, marginTop: 18, padding: 14 },
+  cancelText: { color: "#147A50", fontWeight: "800" }
 });

@@ -10,6 +10,7 @@ interface Obra {
   responsavel: string;
   dataInicio: string;
   dataFim: string;
+  status?: string;
   descricao: string;
   foto?: string;
   localizacao?: { lat: number; long: number };
@@ -134,6 +135,9 @@ export default function DetalheObra() {
       <Text>
         {obra.dataInicio.slice(0, 10)} até {obra.dataFim.slice(0, 10)}
       </Text>
+
+      <Text style={styles.label}>Status da obra:</Text>
+      <Text>{obra.status || "Em andamento"}</Text>
 
       <Text style={styles.label}>Localização:</Text>
       {obra.localizacao

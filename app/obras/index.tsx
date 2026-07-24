@@ -23,6 +23,7 @@ interface Obra {
   responsavel: string;
   dataInicio: string;
   dataFim: string;
+  status?: string;
   descricao?: string;
   foto?: string;
   localizacao?: { lat: number; long: number };
@@ -47,7 +48,11 @@ function formatDate(value?: string) {
   return date.toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" });
 }
 
-function getStatus(dataFim?: string) {
+function getStatus(statusValue?: string, dataFim?: string) {
+  if (statusValue === "Concluída") return { label: "Concluída", color: colors.primary, icon: "check-circle" as const };
+  if (statusValue === "Pausada") return { label: "Pausada", color: colors.warning, icon: "pause-circle" as const };
+  if (statusValue === "Planejada") return { label: "Planejada", color: "#64748B", icon: "calendar-o" as const };
+  if (statusValue === "Em andamento") return { label: "Em andamento", color: colors.primary, icon: "check-circle-o" as const };
   if (!dataFim) return { label: "Sem prazo", color: colors.muted, icon: "calendar-o" as const };
   const end = new Date(dataFim);
   const today = new Date();
@@ -100,7 +105,7 @@ export default function ListaObras() {
   }
 
   function renderObra({ item }: { item: Obra }) {
-    const status = getStatus(item.dataFim);
+    const status = getStatus(item.status, item.dataFim);
     return (
       <TouchableOpacity
         activeOpacity={0.82}
@@ -166,7 +171,7 @@ export default function ListaObras() {
               </View>
               <View style={styles.summaryDivider} />
               <View>
-                <Text style={styles.summaryValue}>{obras.filter((obra) => getStatus(obra.dataFim).label === "Em andamento").length}</Text>
+                <Text style={styles.summaryValue}>{obras.filter((obra) => getStatus(obra.status, obra.dataFim).label === "Em andamento").length}</Text>
                 <Text style={styles.summaryLabel}>em andamento</Text>
               </View>
             </View>
