@@ -15,7 +15,7 @@ import {
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useRouter } from "expo-router";
 import { apiFetch } from "@/utils/api";
-import { clearAuthToken } from "@/utils/session";
+import { clearAuthToken, getAuthUser } from "@/utils/session";
 
 interface Obra {
   _id: string;
@@ -78,6 +78,7 @@ export default function ListaObras() {
   const [refreshing, setRefreshing] = useState(false);
   const [search, setSearch] = useState("");
   const [error, setError] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
   const router = useRouter();
 
   const fetchObras = useCallback(async (initial = false) => {
@@ -99,6 +100,7 @@ export default function ListaObras() {
 
   useEffect(() => {
     void fetchObras(true);
+    void getAuthUser().then((user) => setIsAdmin(user?.role === "admin"));
   }, [fetchObras]);
 
   const filteredObras = useMemo(() => {
@@ -178,9 +180,10 @@ export default function ListaObras() {
                 <Text style={styles.heading}>Olá, fiscal 👋</Text>
                 <Text style={styles.subtitle}>Acompanhe suas obras em um só lugar.</Text>
               </View>
-              <TouchableOpacity style={styles.logoutButton} onPress={sair} accessibilityLabel="Sair">
-                <FontAwesome name="sign-out" size={17} color={colors.muted} />
-              </TouchableOpacity>
+              <View style={styles.headerActions}>
+                {isAdmin && <TouchableOpacity style={styles.teamButton} onPress={() => router.push("/usuarios")}><FontAwesome name="users" size={14} color={colors.primaryDark} /><Text style={styles.teamText}>Equipe</Text></TouchableOpacity>}
+                <TouchableOpacity style={styles.logoutButton} onPress={sair} accessibilityLabel="Sair"><FontAwesome name="sign-out" size={17} color={colors.muted} /></TouchableOpacity>
+              </View>
             </View>
 
             <View style={styles.metricsGrid}>
@@ -239,10 +242,10 @@ export default function ListaObras() {
         }
       />
 
-      <TouchableOpacity style={styles.fab} onPress={() => router.push("/obras/nova")} activeOpacity={0.9}>
+      {isAdmin && <TouchableOpacity style={styles.fab} onPress={() => router.push("/obras/nova")} activeOpacity={0.9}>
         <FontAwesome name="plus" size={18} color="#fff" />
         <Text style={styles.fabText}>Nova obra</Text>
-      </TouchableOpacity>
+      </TouchableOpacity>}
     </SafeAreaView>
   );
 }
@@ -251,6 +254,9 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: colors.background },
   listContent: { padding: 20, paddingBottom: 112 },
   header: { flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 22 },
+  headerActions: { alignItems: "center", flexDirection: "row", gap: 8 },
+  teamButton: { alignItems: "center", backgroundColor: "#E7F6EE", borderRadius: 18, flexDirection: "row", paddingHorizontal: 10, paddingVertical: 9 },
+  teamText: { color: colors.primaryDark, fontSize: 11, fontWeight: "800", marginLeft: 5 },
   eyebrow: { color: colors.primaryDark, fontSize: 11, fontWeight: "800", letterSpacing: 1.4, marginBottom: 6 },
   heading: { color: colors.ink, fontSize: 30, fontWeight: "800", letterSpacing: -0.7 },
   subtitle: { color: colors.muted, fontSize: 14, marginTop: 5 },

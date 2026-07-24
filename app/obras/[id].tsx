@@ -3,6 +3,7 @@ import { View, Text, Image, ScrollView, Button, Alert, TouchableOpacity, Activit
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { apiFetch } from "@/utils/api";
 import Header from "../../components/Header";
+import { getAuthUser } from "@/utils/session";
 
 interface Obra {
   _id: string;
@@ -41,6 +42,7 @@ export default function DetalheObra() {
   const [modalEmail, setModalEmail] = useState(false);
   const [email, setEmail] = useState("");
   const [sending, setSending] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   async function fetchObra() {
     setLoading(true);
@@ -67,6 +69,7 @@ export default function DetalheObra() {
   useEffect(() => {
     fetchObra();
     fetchFiscalizacoes();
+    void getAuthUser().then((user) => setIsAdmin(user?.role === "admin"));
   }, [id]);
 
   async function deletarObra() {
@@ -175,12 +178,12 @@ export default function DetalheObra() {
       )}
 
       <View style={styles.actionGrid}>
-        <TouchableOpacity style={[styles.actionButton, styles.blueAction]} onPress={() => router.push(`/obras/editar/${obra._id}`)}><Text style={styles.actionText}>Editar obra</Text></TouchableOpacity>
+        {isAdmin && <TouchableOpacity style={[styles.actionButton, styles.blueAction]} onPress={() => router.push(`/obras/editar/${obra._id}`)}><Text style={styles.actionText}>Editar obra</Text></TouchableOpacity>}
         <TouchableOpacity style={[styles.actionButton, styles.greenAction]} onPress={() => router.push({ pathname: "/fiscalizacoes/nova", params: { obraId: obra._id } })}><Text style={styles.actionText}>Nova fiscalização</Text></TouchableOpacity>
       </View>
       <View style={styles.actionGrid}>
-        <TouchableOpacity style={[styles.actionButton, styles.orangeAction]} onPress={() => setModalEmail(true)}><Text style={styles.actionText}>Gerar relatório</Text></TouchableOpacity>
-        <TouchableOpacity style={[styles.actionButton, styles.redAction]} onPress={deletarObra}><Text style={styles.actionText}>Excluir obra</Text></TouchableOpacity>
+        {isAdmin && <TouchableOpacity style={[styles.actionButton, styles.orangeAction]} onPress={() => setModalEmail(true)}><Text style={styles.actionText}>Gerar relatório</Text></TouchableOpacity>}
+        {isAdmin && <TouchableOpacity style={[styles.actionButton, styles.redAction]} onPress={deletarObra}><Text style={styles.actionText}>Excluir obra</Text></TouchableOpacity>}
       </View>
 
       {/* Modal para digitar e-mail */}

@@ -60,6 +60,8 @@ Ao abrir o app pela primeira vez, crie um usuário pela API ou use um usuário e
 
 O primeiro usuário cadastrado no backend recebe o papel `admin`; os próximos recebem `fiscal`.
 
+O perfil Administrador gerencia obras, relatórios e usuários pela área **Equipe**. O perfil Fiscal consulta obras e registra/edita fiscalizações, sem acesso às ações administrativas.
+
 ## Funcionalidades
 
 - Cadastro, edição, detalhes e listagem de obras

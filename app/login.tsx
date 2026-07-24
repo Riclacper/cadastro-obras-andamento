@@ -13,7 +13,7 @@ import {
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useRouter } from "expo-router";
 import { apiFetch } from "@/utils/api";
-import { setAuthToken } from "@/utils/session";
+import { setAuthToken, setAuthUser } from "@/utils/session";
 
 const colors = { ink: "#183B56", muted: "#718096", primary: "#1F9D68", primaryDark: "#147A50", background: "#F4F8F6", surface: "#FFFFFF", border: "#DDEAE3" };
 
@@ -45,6 +45,7 @@ export default function LoginScreen() {
       }
 
       await setAuthToken(token);
+      if (data.user?.id && (data.user.role === "admin" || data.user.role === "fiscal")) await setAuthUser(data.user);
       router.replace("/(tabs)");
     } catch (error) {
       Alert.alert(

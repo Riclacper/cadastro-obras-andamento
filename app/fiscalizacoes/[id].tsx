@@ -5,6 +5,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { apiFetch } from "@/utils/api";
 import Header from "../../components/Header";
 import { isoToDdmm } from "../../utils/formatDate";
+import { getAuthUser } from "@/utils/session";
 
 interface Fiscalizacao {
   _id: string;
@@ -21,6 +22,7 @@ export default function DetalheFiscalizacao() {
   const router = useRouter();
   const [fiscalizacao, setFiscalizacao] = useState<Fiscalizacao | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     async function carregar() {
@@ -35,6 +37,7 @@ export default function DetalheFiscalizacao() {
       }
     }
     carregar();
+    void getAuthUser().then((user) => setIsAdmin(user?.role === "admin"));
   }, [id, router]);
 
   async function excluir() {
@@ -85,10 +88,10 @@ export default function DetalheFiscalizacao() {
           <FontAwesome name="pencil" size={16} color="#fff" />
           <Text style={styles.actionText}>Editar fiscalização</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.actionButton, styles.deleteButton]} onPress={excluir} activeOpacity={0.85}>
+        {isAdmin && <TouchableOpacity style={[styles.actionButton, styles.deleteButton]} onPress={excluir} activeOpacity={0.85}>
           <FontAwesome name="trash-o" size={16} color="#fff" />
           <Text style={styles.actionText}>Excluir</Text>
-        </TouchableOpacity>
+        </TouchableOpacity>}
       </View>
     </ScrollView>
   );
