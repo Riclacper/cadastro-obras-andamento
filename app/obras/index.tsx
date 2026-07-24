@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { View, Text, FlatList, TouchableOpacity, Image, ActivityIndicator, StyleSheet, RefreshControl } from "react-native";
 import { useRouter } from "expo-router";
 import { apiFetch } from "@/utils/api";
+import { clearAuthToken } from "@/utils/session";
 
 interface Obra {
   _id: string;
@@ -39,6 +40,11 @@ export default function ListaObras() {
     fetchObras().then(() => setRefreshing(false));
   }, []);
 
+  async function sair() {
+    await clearAuthToken();
+    router.replace("/login");
+  }
+
   useEffect(() => {
     fetchObras();
   }, []);
@@ -69,9 +75,14 @@ export default function ListaObras() {
     <View style={{ flex: 1, padding: 18, backgroundColor: "#fff" }}>
       <View style={styles.titleRow}>
         <Text style={{ fontWeight: "bold", fontSize: 22 }}>Obras cadastradas</Text>
-        <TouchableOpacity onPress={() => router.push("/fiscalizacoes")}>
-          <Text style={styles.link}>Fiscalizações</Text>
-        </TouchableOpacity>
+        <View style={styles.actions}>
+          <TouchableOpacity onPress={() => router.push("/fiscalizacoes")}>
+            <Text style={styles.link}>Fiscalizações</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={sair}>
+            <Text style={styles.logout}>Sair</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {loading ? (
@@ -162,4 +173,6 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   link: { color: "#2980b9", fontWeight: "bold" },
+  actions: { flexDirection: "row", gap: 14 },
+  logout: { color: "#c0392b", fontWeight: "bold" },
 });

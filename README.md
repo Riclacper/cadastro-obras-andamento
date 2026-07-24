@@ -108,6 +108,8 @@ app/
 * **API Backend:** o app espera que o backend (Node.js/MongoDB) esteja rodando e acessível na mesma rede.
 * **Configuração:** a URL é lida de `EXPO_PUBLIC_API_URL`; o arquivo `.env` não deve ser versionado.
 * **Autenticação:** o app usa `POST /auth/login` com `{ email, senha }`; o backend deve retornar `{ token }` ou `{ accessToken }`.
+* **Sessão:** rotas internas exigem token; o botão “Sair” remove a sessão local e retorna ao login.
+* **Produção:** configure `EXPO_PUBLIC_API_URL` com uma URL `https://`. O fallback HTTP é destinado apenas ao desenvolvimento local.
 * **Atualização das listas:** basta puxar para baixo para atualizar as obras ou fiscalizações.
 
 ---
