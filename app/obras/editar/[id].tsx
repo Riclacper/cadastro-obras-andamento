@@ -6,7 +6,7 @@ import * as Location from "expo-location";
 import { ddmmToIso, isoToDdmm } from "../../../utils/formatDate";
 import Header from "../../../components/Header";
 import { StyleSheet } from "react-native";
-import { API_URL } from "@/constants/env";
+import { apiFetch } from "@/utils/api";
 
 interface Localizacao {
   lat: number;
@@ -37,7 +37,7 @@ export default function EditarObra() {
   useEffect(() => {
     async function fetchObra() {
       try {
-        const res = await fetch(`${API_URL}/obras/${id}`);
+        const res = await apiFetch(`/obras/${id}`);
         const data = await res.json();
         setNome(data.nome || "");
         setResponsavel(data.responsavel || "");
@@ -102,7 +102,7 @@ export default function EditarObra() {
       foto,
     };
     try {
-      const res = await fetch(`${API_URL}/obras/${id}`, {
+      const res = await apiFetch(`/obras/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

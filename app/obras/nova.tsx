@@ -5,7 +5,7 @@ import * as Location from "expo-location";
 import { ddmmToIso } from "../../utils/formatDate";
 import Header from "../../components/Header";
 import { StyleSheet } from "react-native";
-import { API_URL } from "@/constants/env";
+import { apiFetch } from "@/utils/api";
 
 interface Localizacao {
   lat: number;
@@ -74,7 +74,7 @@ export default function NovaObra() {
       foto,
     };
     try {
-      const response = await fetch(`${API_URL}/obras`, {
+      const response = await apiFetch("/obras", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

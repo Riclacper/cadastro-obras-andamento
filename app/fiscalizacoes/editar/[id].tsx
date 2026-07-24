@@ -7,7 +7,7 @@ import { Picker } from "@react-native-picker/picker";
 import { ddmmToIso, isoToDdmm } from "../../../utils/formatDate";
 import Header from "../../../components/Header";
 import { StyleSheet } from "react-native";
-import { API_URL } from "@/constants/env";
+import { apiFetch } from "@/utils/api";
 
 interface Obra {
   _id: string;
@@ -39,7 +39,7 @@ export default function EditarFiscalizacao() {
   useEffect(() => {
     async function fetchFiscalizacao() {
       try {
-        const res = await fetch(`${API_URL}/fiscalizacoes/${id}`);
+        const res = await apiFetch(`/fiscalizacoes/${id}`);
         const data = await res.json();
         setObraId(data.obra || "");
         setData(data.data ? isoToDdmm(data.data) : "");
@@ -56,7 +56,7 @@ export default function EditarFiscalizacao() {
     }
     async function fetchObras() {
       try {
-        const res = await fetch(`${API_URL}/obras`);
+        const res = await apiFetch("/obras");
         const data = await res.json();
         setObras(data);
       } catch {
@@ -112,7 +112,7 @@ export default function EditarFiscalizacao() {
       obra: obraId,
     };
     try {
-      const res = await fetch(`${API_URL}/fiscalizacoes/${id}`, {
+      const res = await apiFetch(`/fiscalizacoes/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

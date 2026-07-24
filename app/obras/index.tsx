@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { View, Text, FlatList, TouchableOpacity, Image, ActivityIndicator, StyleSheet, RefreshControl } from "react-native";
 import { useRouter } from "expo-router";
-import { API_URL } from "@/constants/env";
+import { apiFetch } from "@/utils/api";
 
 interface Obra {
   _id: string;
@@ -23,7 +23,7 @@ export default function ListaObras() {
   async function fetchObras() {
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/obras`);
+      const res = await apiFetch("/obras");
       const data = await res.json();
       setObras(data);
     } catch (err) {

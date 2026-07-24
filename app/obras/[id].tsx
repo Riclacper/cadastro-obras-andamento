@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Image, ScrollView, Button, Alert, TouchableOpacity, ActivityIndicator, Modal, TextInput, StyleSheet } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { API_URL } from "@/constants/env";
+import { apiFetch } from "@/utils/api";
 
 interface Obra {
   _id: string;
@@ -36,7 +36,7 @@ export default function DetalheObra() {
   async function fetchObra() {
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/obras/${id}`);
+      const res = await apiFetch(`/obras/${id}`);
       const data = await res.json();
       setObra(data);
     } catch (err) {
@@ -47,7 +47,7 @@ export default function DetalheObra() {
 
   async function fetchFiscalizacoes() {
     try {
-      const res = await fetch(`${API_URL}/obras/${id}/fiscalizacoes`);
+      const res = await apiFetch(`/obras/${id}/fiscalizacoes`);
       const data = await res.json();
       setFiscalizacoes(data);
     } catch (err) {
@@ -71,7 +71,7 @@ export default function DetalheObra() {
           style: "destructive",
           onPress: async () => {
             try {
-              const res = await fetch(`${API_URL}/obras/${id}`, { method: "DELETE" });
+              const res = await apiFetch(`/obras/${id}`, { method: "DELETE" });
               if (res.ok) {
                 Alert.alert("Obra excluída com sucesso!");
                 router.replace("/obras");
@@ -94,7 +94,7 @@ export default function DetalheObra() {
     }
     setSending(true);
     try {
-      const res = await fetch(`${API_URL}/obras/${id}/email`, {
+      const res = await apiFetch(`/obras/${id}/email`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email })
