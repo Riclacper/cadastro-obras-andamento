@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { View, Text, FlatList, TouchableOpacity, Image, ActivityIndicator, StyleSheet, RefreshControl } from "react-native";
 import { useRouter } from "expo-router";
+import { API_URL } from "@/constants/env";
 
 interface Obra {
   _id: string;
@@ -12,8 +13,6 @@ interface Obra {
   foto?: string;
   localizacao?: { lat: number; long: number };
 }
-
-const API_URL = "http://192.168.0.102:5000"; // Substitua pelo IP do seu backend
 
 export default function ListaObras() {
   const [obras, setObras] = useState<Obra[]>([]);

@@ -5,6 +5,7 @@ import * as Location from "expo-location";
 import { ddmmToIso } from "../../utils/formatDate";
 import Header from "../../components/Header";
 import { StyleSheet } from "react-native";
+import { API_URL } from "@/constants/env";
 
 interface Localizacao {
   lat: number;
@@ -19,8 +20,6 @@ interface ObraPayload {
   descricao: string;
   foto: string;
 }
-const API_URL = "http://192.168.0.102:5000"; // Altere para seu backend
-
 export default function NovaObra() {
   const [nome, setNome] = useState("");
   const [responsavel, setResponsavel] = useState("");

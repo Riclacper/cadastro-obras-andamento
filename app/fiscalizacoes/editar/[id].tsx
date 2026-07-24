@@ -7,6 +7,7 @@ import { Picker } from "@react-native-picker/picker";
 import { ddmmToIso, isoToDdmm } from "../../../utils/formatDate";
 import Header from "../../../components/Header";
 import { StyleSheet } from "react-native";
+import { API_URL } from "@/constants/env";
 
 interface Obra {
   _id: string;
@@ -20,8 +21,6 @@ interface FiscalizacaoPayload {
   foto: string;
   obra: string;
 }
-const API_URL = "http://192.168.0.102:5000";
-
 export default function EditarFiscalizacao() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();

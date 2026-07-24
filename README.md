@@ -29,18 +29,24 @@ Permite registrar obras, fiscalizações, anexar fotos, localização por GPS, e
 
 ```bash
 npm install
-````
-
-### Altere o IP da API
-
-No(s) arquivo(s) `.tsx`, altere:
-
-```ts
-const API_URL = "http://SEU_IP_LOCAL:5000"
 ```
 
-* Descubra o IP do seu computador com `ifconfig` (Mac/Linux) ou `ipconfig` (Windows).
-* Exemplo: `http://192.168.0.102:5000`
+### Configure a API
+
+Copie o arquivo de exemplo e informe a URL do backend:
+
+```bash
+cp .env.example .env
+```
+
+Edite `.env`:
+
+```env
+EXPO_PUBLIC_API_URL=http://SEU_IP_LOCAL:5000
+```
+
+Em um celular físico, `SEU_IP_LOCAL` deve ser o IP do computador na mesma rede
+Wi-Fi do aparelho. Não é necessário alterar arquivos `.tsx`.
 
 ### Inicie o projeto
 
@@ -78,10 +84,9 @@ app/
   │     ├── [id].tsx          # Detalhes da obra
   │     └── editar/[id].tsx   # Edição de obra
   ├── fiscalizacoes/
-  │     ├── index.tsx         # Listagem de fiscalizações (com refresh)
   │     ├── nova.tsx          # Cadastro de fiscalização
   │     ├── editar/[id].tsx   # Edição de fiscalização
-  │     └── [id].tsx          # Detalhes da fiscalização
+  │     └── ...
   ├── components/
   │     └── Header.tsx        # Componente da logo
   ├── assets/
@@ -101,6 +106,7 @@ app/
 * **Datas:** preencha sempre como `DD-MM-YYYY` ou `DD/MM/YYYY` (app converte automaticamente para ISO).
 * **Permissões:** o app solicita acesso à câmera e localização quando necessário.
 * **API Backend:** o app espera que o backend (Node.js/MongoDB) esteja rodando e acessível na mesma rede.
+* **Configuração:** a URL é lida de `EXPO_PUBLIC_API_URL`; o arquivo `.env` não deve ser versionado.
 * **Atualização das listas:** basta puxar para baixo para atualizar as obras ou fiscalizações.
 
 ---
@@ -121,4 +127,3 @@ Orientação acadêmica: **Geraldo Gomes**
 ## 📚 Licença
 
 Este projeto é para fins acadêmicos e didáticos.
-

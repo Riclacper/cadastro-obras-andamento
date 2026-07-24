@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Image, ScrollView, Button, Alert, TouchableOpacity, ActivityIndicator, Modal, TextInput, StyleSheet } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
+import { API_URL } from "@/constants/env";
 
 interface Obra {
   _id: string;
@@ -21,8 +22,6 @@ interface Fiscalizacao {
   foto?: string;
   localizacao?: { lat: number; long: number };
 }
-
-const API_URL = "http://192.168.0.102:5000"; // Altere para seu backend
 
 export default function DetalheObra() {
   const { id } = useLocalSearchParams<{ id: string }>();
