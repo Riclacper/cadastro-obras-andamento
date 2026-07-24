@@ -29,6 +29,14 @@ interface Obra {
   localizacao?: { lat: number; long: number };
 }
 
+interface FiscalizacaoResumo {
+  _id: string;
+  data: string;
+  status: string;
+  observacoes: string;
+  obra?: string | { _id: string; nome: string };
+}
+
 const colors = {
   ink: "#183B56",
   muted: "#718096",
@@ -65,6 +73,7 @@ function getStatus(statusValue?: string, dataFim?: string) {
 
 export default function ListaObras() {
   const [obras, setObras] = useState<Obra[]>([]);
+  const [fiscalizacoes, setFiscalizacoes] = useState<FiscalizacaoResumo[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [search, setSearch] = useState("");
@@ -75,10 +84,11 @@ export default function ListaObras() {
     if (initial) setLoading(true);
     setError("");
     try {
-      const response = await apiFetch("/obras");
-      if (!response.ok) throw new Error("Não foi possível carregar as obras.");
-      const data = await response.json();
-      setObras(Array.isArray(data) ? data : []);
+      const [obrasResponse, fiscalizacoesResponse] = await Promise.all([apiFetch("/obras"), apiFetch("/fiscalizacoes")]);
+      if (!obrasResponse.ok || !fiscalizacoesResponse.ok) throw new Error("Não foi possível carregar o dashboard.");
+      const [obrasData, fiscalizacoesData] = await Promise.all([obrasResponse.json(), fiscalizacoesResponse.json()]);
+      setObras(Array.isArray(obrasData) ? obrasData : []);
+      setFiscalizacoes(Array.isArray(fiscalizacoesData) ? fiscalizacoesData : []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Verifique a conexão com a API.");
     } finally {
@@ -141,6 +151,16 @@ export default function ListaObras() {
     );
   }
 
+  const concluidas = obras.filter((obra) => getStatus(obra.status, obra.dataFim).label === "Concluída").length;
+  const emAndamento = obras.filter((obra) => getStatus(obra.status, obra.dataFim).label === "Em andamento").length;
+  const pausadas = obras.filter((obra) => getStatus(obra.status, obra.dataFim).label === "Pausada").length;
+  const proximasDoVencimento = obras.filter((obra) => {
+    if (obra.status === "Concluída" || obra.status === "Pausada" || !obra.dataFim) return false;
+    const dias = Math.ceil((new Date(obra.dataFim).getTime() - Date.now()) / 86400000);
+    return dias >= 0 && dias <= 30;
+  }).length;
+  const recentes = [...fiscalizacoes].sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()).slice(0, 3);
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <FlatList
@@ -163,18 +183,22 @@ export default function ListaObras() {
               </TouchableOpacity>
             </View>
 
-            <View style={styles.summary}>
-              <View style={styles.summaryIcon}><FontAwesome name="building" size={20} color={colors.primary} /></View>
-              <View>
-                <Text style={styles.summaryValue}>{obras.length}</Text>
-                <Text style={styles.summaryLabel}>obras cadastradas</Text>
-              </View>
-              <View style={styles.summaryDivider} />
-              <View>
-                <Text style={styles.summaryValue}>{obras.filter((obra) => getStatus(obra.status, obra.dataFim).label === "Em andamento").length}</Text>
-                <Text style={styles.summaryLabel}>em andamento</Text>
-              </View>
+            <View style={styles.metricsGrid}>
+              <View style={styles.metricCard}><Text style={styles.metricValue}>{obras.length}</Text><Text style={styles.metricLabel}>Total de obras</Text></View>
+              <View style={styles.metricCard}><Text style={[styles.metricValue, { color: "#168557" }]}>{concluidas}</Text><Text style={styles.metricLabel}>Concluídas</Text></View>
+              <View style={styles.metricCard}><Text style={[styles.metricValue, { color: "#D97706" }]}>{emAndamento}</Text><Text style={styles.metricLabel}>Em andamento</Text></View>
+              <View style={styles.metricCard}><Text style={[styles.metricValue, { color: "#B83B45" }]}>{pausadas}</Text><Text style={styles.metricLabel}>Pausadas</Text></View>
             </View>
+
+            <View style={styles.insightsRow}>
+              <View style={styles.insightCard}><FontAwesome name="calendar-o" size={16} color="#D97706" /><Text style={styles.insightText}><Text style={styles.insightValue}>{proximasDoVencimento}</Text> próximas do vencimento</Text></View>
+              <View style={styles.insightCard}><FontAwesome name="clipboard" size={16} color={colors.primary} /><Text style={styles.insightText}><Text style={styles.insightValue}>{fiscalizacoes.length}</Text> fiscalizações</Text></View>
+            </View>
+
+            {recentes.length > 0 && <View style={styles.recentPanel}>
+              <View style={styles.recentHeader}><Text style={styles.recentTitle}>Fiscalizações recentes</Text><TouchableOpacity onPress={() => router.push("/fiscalizacoes")}><Text style={styles.link}>Ver todas</Text></TouchableOpacity></View>
+              {recentes.map((item) => <TouchableOpacity key={item._id} style={styles.recentItem} onPress={() => router.push(`/fiscalizacoes/${item._id}`)}><View style={styles.recentDot} /><View style={styles.recentBody}><Text style={styles.recentStatus}>{item.status}</Text><Text style={styles.recentObservation} numberOfLines={1}>{item.observacoes}</Text></View><Text style={styles.recentDate}>{formatDate(item.data)}</Text></TouchableOpacity>)}
+            </View>}
 
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Minhas obras</Text>
@@ -231,11 +255,23 @@ const styles = StyleSheet.create({
   heading: { color: colors.ink, fontSize: 30, fontWeight: "800", letterSpacing: -0.7 },
   subtitle: { color: colors.muted, fontSize: 14, marginTop: 5 },
   logoutButton: { alignItems: "center", backgroundColor: colors.surface, borderColor: colors.border, borderRadius: 22, borderWidth: 1, height: 44, justifyContent: "center", width: 44 },
-  summary: { alignItems: "center", backgroundColor: colors.surface, borderColor: colors.border, borderRadius: 18, borderWidth: 1, flexDirection: "row", marginBottom: 28, padding: 17 },
-  summaryIcon: { alignItems: "center", backgroundColor: "#E7F6EE", borderRadius: 12, height: 42, justifyContent: "center", marginRight: 12, width: 42 },
-  summaryValue: { color: colors.ink, fontSize: 21, fontWeight: "800" },
-  summaryLabel: { color: colors.muted, fontSize: 12, marginTop: 2 },
-  summaryDivider: { backgroundColor: colors.border, height: 36, marginHorizontal: 18, width: 1 },
+  metricsGrid: { flexDirection: "row", flexWrap: "wrap", gap: 10, marginBottom: 12 },
+  metricCard: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: 14, borderWidth: 1, flexBasis: "47%", flexGrow: 1, minHeight: 76, padding: 13 },
+  metricValue: { color: colors.ink, fontSize: 24, fontWeight: "800" },
+  metricLabel: { color: colors.muted, fontSize: 11, marginTop: 3 },
+  insightsRow: { flexDirection: "row", gap: 10, marginBottom: 22 },
+  insightCard: { alignItems: "center", backgroundColor: "#E7F6EE", borderRadius: 12, flex: 1, flexDirection: "row", minHeight: 48, paddingHorizontal: 12 },
+  insightText: { color: colors.muted, flex: 1, fontSize: 11, marginLeft: 8 },
+  insightValue: { color: colors.ink, fontSize: 16, fontWeight: "800" },
+  recentPanel: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: 16, borderWidth: 1, marginBottom: 24, padding: 14 },
+  recentHeader: { alignItems: "center", flexDirection: "row", justifyContent: "space-between", marginBottom: 8 },
+  recentTitle: { color: colors.ink, fontSize: 15, fontWeight: "800" },
+  recentItem: { alignItems: "center", borderTopColor: colors.border, borderTopWidth: 1, flexDirection: "row", paddingVertical: 11 },
+  recentDot: { backgroundColor: colors.primary, borderRadius: 5, height: 10, marginRight: 10, width: 10 },
+  recentBody: { flex: 1, minWidth: 0 },
+  recentStatus: { color: colors.ink, fontSize: 12, fontWeight: "800" },
+  recentObservation: { color: colors.muted, fontSize: 11, marginTop: 3 },
+  recentDate: { color: colors.muted, fontSize: 10, marginLeft: 8 },
   sectionHeader: { alignItems: "center", flexDirection: "row", justifyContent: "space-between", marginBottom: 12 },
   sectionTitle: { color: colors.ink, fontSize: 19, fontWeight: "800" },
   link: { color: colors.primaryDark, fontSize: 13, fontWeight: "700" },
