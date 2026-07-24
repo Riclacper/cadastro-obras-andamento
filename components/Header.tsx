@@ -2,6 +2,7 @@ import React from "react";
 import { View, Image, Text, TouchableOpacity, StyleSheet } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useRouter } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface HeaderProps {
   title?: string;
@@ -10,9 +11,10 @@ interface HeaderProps {
 
 export default function Header({ title = "Cadastro de Obras", showBack = true }: HeaderProps) {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top + 8 }]}>
       <TouchableOpacity
         style={[styles.backButton, !showBack && styles.hidden]}
         onPress={() => router.back()}

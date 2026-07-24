@@ -4,7 +4,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
 import { Picker } from "@react-native-picker/picker";
-import { ddmmToIso, isValidDdmm, isoToDdmm } from "../../../utils/formatDate";
+import { ddmmToIso, isValidDdmm, isoToDdmm, maskDdmm } from "../../../utils/formatDate";
 import Header from "../../../components/Header";
 import { StyleSheet } from "react-native";
 import { apiFetch } from "@/utils/api";
@@ -141,8 +141,7 @@ export default function EditarFiscalizacao() {
 
   return (
     <ScrollView contentContainerStyle={{ padding: 20, backgroundColor: "#f5f6fa", flexGrow: 1 }}>
-      <Header />
-      <Text style={styles.titulo}>Editar Fiscalização</Text>
+      <Header title="Editar fiscalização" />
       <Text style={styles.label}>Obra vinculada *</Text>
       <View style={styles.pickerBox}>
         <Picker
@@ -157,7 +156,7 @@ export default function EditarFiscalizacao() {
         </Picker>
       </View>
       <Text style={styles.label}>Data da fiscalização *</Text>
-      <TextInput value={data} onChangeText={setData} placeholder="DD-MM-YYYY" style={styles.input} />
+      <TextInput value={data} onChangeText={(value) => setData(maskDdmm(value))} placeholder="DD/MM/AAAA" keyboardType="number-pad" maxLength={10} style={styles.input} />
       <Text style={styles.label}>Status *</Text>
       <View style={styles.pickerBox}>
         <Picker

@@ -105,7 +105,6 @@ export default function NovaObra() {
   return (
     <ScrollView contentContainerStyle={{ padding: 20, backgroundColor: "#f5f6fa", flexGrow: 1 }}>
       <Header title="Nova obra" />
-      <Text style={styles.titulo}>Cadastro de Obra</Text>
       <Text style={styles.label}>Nome da obra *</Text>
       <TextInput value={nome} onChangeText={setNome} style={styles.input} />
       <Text style={styles.label}>Responsável *</Text>

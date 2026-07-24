@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, Image, Alert, ScrollView, Acti
 import { useLocalSearchParams, useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
-import { ddmmToIso, isValidDdmm, isoToDdmm } from "../../../utils/formatDate";
+import { ddmmToIso, isValidDdmm, isoToDdmm, maskDdmm } from "../../../utils/formatDate";
 import Header from "../../../components/Header";
 import { StyleSheet } from "react-native";
 import { apiFetch } from "@/utils/api";
@@ -135,16 +135,15 @@ export default function EditarObra() {
 
   return (
     <ScrollView contentContainerStyle={{ padding: 20, backgroundColor: "#f5f6fa", flexGrow: 1 }}>
-      <Header />
-      <Text style={styles.titulo}>Editar Obra</Text>
+      <Header title="Editar obra" />
       <Text style={styles.label}>Nome da obra *</Text>
       <TextInput value={nome} onChangeText={setNome} style={styles.input} />
       <Text style={styles.label}>Responsável *</Text>
       <TextInput value={responsavel} onChangeText={setResponsavel} style={styles.input} />
       <Text style={styles.label}>Data de início *</Text>
-      <TextInput value={dataInicio} onChangeText={setDataInicio} placeholder="DD-MM-YYYY" style={styles.input} />
+      <TextInput value={dataInicio} onChangeText={(value) => setDataInicio(maskDdmm(value))} placeholder="DD/MM/AAAA" keyboardType="number-pad" maxLength={10} style={styles.input} />
       <Text style={styles.label}>Data de término *</Text>
-      <TextInput value={dataFim} onChangeText={setDataFim} placeholder="DD-MM-YYYY" style={styles.input} />
+      <TextInput value={dataFim} onChangeText={(value) => setDataFim(maskDdmm(value))} placeholder="DD/MM/AAAA" keyboardType="number-pad" maxLength={10} style={styles.input} />
       <Text style={styles.label}>Descrição *</Text>
       <TextInput value={descricao} onChangeText={setDescricao} multiline numberOfLines={3} style={styles.input} />
       <Text style={styles.label}>Foto da Obra</Text>

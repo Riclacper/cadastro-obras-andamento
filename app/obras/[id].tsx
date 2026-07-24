@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, Image, ScrollView, Button, Alert, TouchableOpacity, ActivityIndicator, Modal, TextInput, StyleSheet } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { apiFetch } from "@/utils/api";
+import Header from "../../components/Header";
 
 interface Obra {
   _id: string;
@@ -119,7 +120,7 @@ export default function DetalheObra() {
 
   return (
     <ScrollView contentContainerStyle={{ padding: 18, backgroundColor: "#fff", flexGrow: 1 }}>
-      <Text style={styles.titulo}>{obra.nome}</Text>
+      <Header title={obra.nome} />
       {obra.foto ? (
         <Image source={{ uri: obra.foto }} style={styles.img} />
       ) : (

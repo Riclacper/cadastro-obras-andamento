@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Button, Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { apiFetch } from "@/utils/api";
+import Header from "../../components/Header";
 
 interface Fiscalizacao {
   _id: string;
@@ -61,7 +62,7 @@ export default function DetalheFiscalizacao() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Detalhes da fiscalização</Text>
+      <Header title="Detalhes da fiscalização" />
       <Text style={styles.label}>Obra</Text>
       <Text>{nomeObra}</Text>
       <Text style={styles.label}>Data</Text>
@@ -88,7 +89,6 @@ export default function DetalheFiscalizacao() {
 const styles = StyleSheet.create({
   container: { padding: 18, backgroundColor: "#fff", flexGrow: 1 },
   loading: { marginTop: 64 },
-  title: { fontWeight: "bold", fontSize: 22, marginBottom: 18 },
   label: { fontWeight: "bold", marginTop: 14, marginBottom: 3 },
   image: { width: "100%", height: 220, borderRadius: 8, marginTop: 18 },
   actions: { flexDirection: "row", justifyContent: "space-between", marginTop: 28 },

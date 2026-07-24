@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { apiFetch } from "@/utils/api";
+import Header from "../../components/Header";
 
 interface Fiscalizacao {
   _id: string;
@@ -56,7 +57,7 @@ export default function ListaFiscalizacoes() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Fiscalizações</Text>
+      <Header title="Fiscalizações" />
       <FlatList
         data={fiscalizacoes}
         keyExtractor={(item) => item._id}
@@ -91,7 +92,6 @@ export default function ListaFiscalizacoes() {
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 18, backgroundColor: "#fff" },
   loading: { marginTop: 64 },
-  title: { fontWeight: "bold", fontSize: 22, marginBottom: 18 },
   list: { paddingBottom: 90 },
   emptyList: { flexGrow: 1 },
   card: {
