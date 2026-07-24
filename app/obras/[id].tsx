@@ -160,7 +160,7 @@ export default function DetalheObra() {
 
       <Text style={[styles.label, { fontSize: 18 }]}>Fiscalizações da obra</Text>
       {fiscalizacoes.length === 0 ? (
-        <Text>Nenhuma fiscalização cadastrada.</Text>
+        <Text style={styles.emptyFiscalizacoes}>Nenhuma fiscalização cadastrada.</Text>
       ) : (
         fiscalizacoes.map((f) => (
             <TouchableOpacity key={f._id} style={styles.fiscalCard} onPress={() => router.push(`/fiscalizacoes/${f._id}`)}>
@@ -219,7 +219,8 @@ const styles = StyleSheet.create({
   statusBadge: { alignSelf: "flex-start", borderRadius: 9, marginTop: 2, paddingHorizontal: 10, paddingVertical: 6 },
   statusText: { fontSize: 13, fontWeight: "800" },
   fiscImg: { width: 80, height: 60, borderRadius: 6, marginTop: 6 },
-  actionGrid: { flexDirection: "row", gap: 10, marginBottom: 10 },
+  emptyFiscalizacoes: { color: "#718096", marginBottom: 18, marginTop: 4 },
+  actionGrid: { flexDirection: "row", gap: 10, marginBottom: 10, marginTop: 4 },
   actionButton: { alignItems: "center", borderRadius: 12, flex: 1, justifyContent: "center", minHeight: 52, paddingHorizontal: 8, paddingVertical: 10 },
   actionText: { color: "#fff", fontSize: 13, fontWeight: "800", textAlign: "center" },
   blueAction: { backgroundColor: "#2477A8" },
