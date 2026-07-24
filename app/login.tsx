@@ -1,18 +1,32 @@
 import React, { useState } from "react";
-import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useRouter } from "expo-router";
 import { apiFetch } from "@/utils/api";
 import { setAuthToken } from "@/utils/session";
+
+const colors = { ink: "#183B56", muted: "#718096", primary: "#1F9D68", primaryDark: "#147A50", background: "#F4F8F6", surface: "#FFFFFF", border: "#DDEAE3" };
 
 export default function LoginScreen() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   async function entrar() {
     if (!email.trim() || !senha) {
-      Alert.alert("Informe seu e-mail e sua senha.");
+      Alert.alert("Dados incompletos", "Informe seu e-mail e sua senha.");
       return;
     }
 
@@ -47,38 +61,63 @@ export default function LoginScreen() {
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
+      <View style={styles.brandMark}><FontAwesome name="building" size={28} color="#fff" /></View>
+      <Text style={styles.kicker}>GESTÃO INTELIGENTE</Text>
       <Text style={styles.title}>Cadastro de Obras</Text>
-      <Text style={styles.subtitle}>Entre para acompanhar suas obras</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="E-mail"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-        autoCorrect={false}
-        keyboardType="email-address"
-        editable={!loading}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Senha"
-        value={senha}
-        onChangeText={setSenha}
-        secureTextEntry
-        editable={!loading}
-      />
-      <TouchableOpacity style={styles.button} onPress={entrar} disabled={loading}>
-        {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Entrar</Text>}
-      </TouchableOpacity>
+      <Text style={styles.subtitle}>Acompanhe projetos, prazos e fiscalizações em um só lugar.</Text>
+
+      <View style={styles.form}>
+        <Text style={styles.label}>E-mail</Text>
+        <View style={styles.inputWrap}>
+          <FontAwesome name="envelope-o" size={16} color={colors.muted} />
+          <TextInput
+            style={styles.input}
+            placeholder="seu@email.com"
+            placeholderTextColor="#A1B0A8"
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            autoCorrect={false}
+            keyboardType="email-address"
+            editable={!loading}
+          />
+        </View>
+        <Text style={styles.label}>Senha</Text>
+        <View style={styles.inputWrap}>
+          <FontAwesome name="lock" size={18} color={colors.muted} />
+          <TextInput
+            style={styles.input}
+            placeholder="Digite sua senha"
+            placeholderTextColor="#A1B0A8"
+            value={senha}
+            onChangeText={setSenha}
+            secureTextEntry={!showPassword}
+            editable={!loading}
+          />
+          <TouchableOpacity onPress={() => setShowPassword((value) => !value)} accessibilityLabel={showPassword ? "Ocultar senha" : "Mostrar senha"}>
+            <FontAwesome name={showPassword ? "eye-slash" : "eye"} size={17} color={colors.muted} />
+          </TouchableOpacity>
+        </View>
+        <TouchableOpacity style={styles.button} onPress={entrar} disabled={loading} activeOpacity={0.85}>
+          {loading ? <ActivityIndicator color="#fff" /> : <><Text style={styles.buttonText}>Entrar no painel</Text><FontAwesome name="arrow-right" size={16} color="#fff" /></>}
+        </TouchableOpacity>
+      </View>
+      <Text style={styles.footer}>Ambiente seguro para acompanhamento de obras</Text>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", padding: 24, backgroundColor: "#f5f6fa" },
-  title: { color: "#2980b9", fontSize: 28, fontWeight: "bold", textAlign: "center" },
-  subtitle: { color: "#666", marginBottom: 28, marginTop: 8, textAlign: "center" },
-  input: { backgroundColor: "#fff", borderColor: "#27ae60", borderRadius: 8, borderWidth: 1, marginBottom: 14, padding: 14 },
-  button: { alignItems: "center", backgroundColor: "#27ae60", borderRadius: 8, padding: 14 },
-  buttonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+  container: { flex: 1, backgroundColor: colors.background, justifyContent: "center", padding: 24 },
+  brandMark: { alignItems: "center", alignSelf: "center", backgroundColor: colors.primaryDark, borderRadius: 18, height: 64, justifyContent: "center", marginBottom: 16, transform: [{ rotate: "-4deg" }], width: 64 },
+  kicker: { color: colors.primaryDark, fontSize: 11, fontWeight: "800", letterSpacing: 1.5, textAlign: "center" },
+  title: { color: colors.ink, fontSize: 30, fontWeight: "800", marginTop: 7, textAlign: "center" },
+  subtitle: { color: colors.muted, fontSize: 14, lineHeight: 21, marginHorizontal: 16, marginTop: 9, textAlign: "center" },
+  form: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: 20, borderWidth: 1, marginTop: 30, padding: 20 },
+  label: { color: colors.ink, fontSize: 12, fontWeight: "800", marginBottom: 7, marginTop: 4 },
+  inputWrap: { alignItems: "center", borderColor: colors.border, borderRadius: 11, borderWidth: 1, flexDirection: "row", marginBottom: 15, paddingHorizontal: 13 },
+  input: { color: colors.ink, flex: 1, fontSize: 15, paddingHorizontal: 10, paddingVertical: 13 },
+  button: { alignItems: "center", backgroundColor: colors.primaryDark, borderRadius: 11, flexDirection: "row", justifyContent: "center", marginTop: 5, padding: 15 },
+  buttonText: { color: "#fff", fontSize: 15, fontWeight: "800", marginRight: 10 },
+  footer: { color: colors.muted, fontSize: 12, marginTop: 24, textAlign: "center" },
 });

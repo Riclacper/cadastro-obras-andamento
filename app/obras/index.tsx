@@ -1,5 +1,18 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { View, Text, FlatList, TouchableOpacity, Image, ActivityIndicator, StyleSheet, RefreshControl } from "react-native";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Image,
+  RefreshControl,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useRouter } from "expo-router";
 import { apiFetch } from "@/utils/api";
 import { clearAuthToken } from "@/utils/session";
@@ -10,169 +23,240 @@ interface Obra {
   responsavel: string;
   dataInicio: string;
   dataFim: string;
-  descricao: string;
+  descricao?: string;
   foto?: string;
   localizacao?: { lat: number; long: number };
+}
+
+const colors = {
+  ink: "#183B56",
+  muted: "#718096",
+  primary: "#1F9D68",
+  primaryDark: "#147A50",
+  surface: "#FFFFFF",
+  background: "#F4F8F6",
+  border: "#E2ECE7",
+  warning: "#D97706",
+  danger: "#C24146",
+};
+
+function formatDate(value?: string) {
+  if (!value) return "Data não informada";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value.slice(0, 10);
+  return date.toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" });
+}
+
+function getStatus(dataFim?: string) {
+  if (!dataFim) return { label: "Sem prazo", color: colors.muted, icon: "calendar-o" as const };
+  const end = new Date(dataFim);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  if (end < today) return { label: "Prazo encerrado", color: colors.danger, icon: "clock-o" as const };
+  const days = Math.ceil((end.getTime() - today.getTime()) / 86400000);
+  if (days <= 30) return { label: "Atenção ao prazo", color: colors.warning, icon: "exclamation-circle" as const };
+  return { label: "Em andamento", color: colors.primary, icon: "check-circle-o" as const };
 }
 
 export default function ListaObras() {
   const [obras, setObras] = useState<Obra[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [search, setSearch] = useState("");
+  const [error, setError] = useState("");
   const router = useRouter();
 
-  async function fetchObras() {
-    setLoading(true);
+  const fetchObras = useCallback(async (initial = false) => {
+    if (initial) setLoading(true);
+    setError("");
     try {
-      const res = await apiFetch("/obras");
-      const data = await res.json();
-      setObras(data);
+      const response = await apiFetch("/obras");
+      if (!response.ok) throw new Error("Não foi possível carregar as obras.");
+      const data = await response.json();
+      setObras(Array.isArray(data) ? data : []);
     } catch (err) {
-      alert("Erro ao carregar obras!");
+      setError(err instanceof Error ? err.message : "Verifique a conexão com a API.");
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
-  }
-
-  // Função para refresh puxando com o dedo
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    fetchObras().then(() => setRefreshing(false));
   }, []);
+
+  useEffect(() => {
+    void fetchObras(true);
+  }, [fetchObras]);
+
+  const filteredObras = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    if (!term) return obras;
+    return obras.filter((obra) =>
+      [obra.nome, obra.responsavel, obra.descricao].some((value) => value?.toLowerCase().includes(term))
+    );
+  }, [obras, search]);
 
   async function sair() {
     await clearAuthToken();
     router.replace("/login");
   }
 
-  useEffect(() => {
-    fetchObras();
-  }, []);
-
   function renderObra({ item }: { item: Obra }) {
+    const status = getStatus(item.dataFim);
     return (
       <TouchableOpacity
+        activeOpacity={0.82}
         style={styles.card}
         onPress={() => router.push(`/obras/${item._id}`)}
       >
         {item.foto ? (
-          <Image source={{ uri: item.foto }} style={styles.img} />
+          <Image source={{ uri: item.foto }} style={styles.image} />
         ) : (
-          <View style={styles.noImg}><Text>Sem Foto</Text></View>
+          <View style={styles.imagePlaceholder}>
+            <FontAwesome name="building-o" size={24} color={colors.primary} />
+          </View>
         )}
-        <View style={{ flex: 1 }}>
-          <Text style={styles.nome}>{item.nome}</Text>
-          <Text style={styles.resp}>Responsável: {item.responsavel}</Text>
-          <Text style={styles.datas}>
-            {item.dataInicio.slice(0, 10)} a {item.dataFim.slice(0, 10)}
+        <View style={styles.cardBody}>
+          <View style={styles.cardTitleRow}>
+            <Text style={styles.cardTitle} numberOfLines={1}>{item.nome}</Text>
+            <FontAwesome name="angle-right" size={20} color="#A5B5AE" />
+          </View>
+          <Text style={styles.owner} numberOfLines={1}>
+            <FontAwesome name="user-o" size={12} color={colors.muted} /> {item.responsavel || "Responsável não informado"}
           </Text>
+          <View style={styles.cardFooter}>
+            <Text style={styles.date}>
+              <FontAwesome name="calendar-o" size={12} color={colors.muted} /> {formatDate(item.dataInicio)} — {formatDate(item.dataFim)}
+            </Text>
+            <View style={[styles.status, { backgroundColor: `${status.color}18` }]}>
+              <FontAwesome name={status.icon} size={11} color={status.color} />
+              <Text style={[styles.statusText, { color: status.color }]}>{status.label}</Text>
+            </View>
+          </View>
         </View>
       </TouchableOpacity>
     );
   }
 
   return (
-    <View style={{ flex: 1, padding: 18, backgroundColor: "#fff" }}>
-      <View style={styles.titleRow}>
-        <Text style={{ fontWeight: "bold", fontSize: 22 }}>Obras cadastradas</Text>
-        <View style={styles.actions}>
-          <TouchableOpacity onPress={() => router.push("/fiscalizacoes")}>
-            <Text style={styles.link}>Fiscalizações</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={sair}>
-            <Text style={styles.logout}>Sair</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+    <SafeAreaView style={styles.safeArea}>
+      <FlatList
+        data={filteredObras}
+        keyExtractor={(item) => item._id}
+        renderItem={renderObra}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.listContent}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); void fetchObras(); }} tintColor={colors.primary} />}
+        ListHeaderComponent={
+          <View>
+            <View style={styles.header}>
+              <View>
+                <Text style={styles.eyebrow}>PAINEL DE CONTROLE</Text>
+                <Text style={styles.heading}>Olá, fiscal 👋</Text>
+                <Text style={styles.subtitle}>Acompanhe suas obras em um só lugar.</Text>
+              </View>
+              <TouchableOpacity style={styles.logoutButton} onPress={sair} accessibilityLabel="Sair">
+                <FontAwesome name="sign-out" size={17} color={colors.muted} />
+              </TouchableOpacity>
+            </View>
 
-      {loading ? (
-        <ActivityIndicator size="large" color="#2d7" style={{ marginTop: 32 }} />
-      ) : (
-        <FlatList
-          data={obras}
-          keyExtractor={(item) => item._id}
-          renderItem={renderObra}
-          ListEmptyComponent={<Text>Nenhuma obra cadastrada.</Text>}
-          contentContainerStyle={{ paddingBottom: 40 }}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-        />
-      )}
+            <View style={styles.summary}>
+              <View style={styles.summaryIcon}><FontAwesome name="building" size={20} color={colors.primary} /></View>
+              <View>
+                <Text style={styles.summaryValue}>{obras.length}</Text>
+                <Text style={styles.summaryLabel}>obras cadastradas</Text>
+              </View>
+              <View style={styles.summaryDivider} />
+              <View>
+                <Text style={styles.summaryValue}>{obras.filter((obra) => getStatus(obra.dataFim).label === "Em andamento").length}</Text>
+                <Text style={styles.summaryLabel}>em andamento</Text>
+              </View>
+            </View>
 
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={() => router.push("/obras/nova")}
-      >
-        <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 28 }}>+</Text>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Minhas obras</Text>
+              <TouchableOpacity onPress={() => router.push("/fiscalizacoes")}>
+                <Text style={styles.link}>Fiscalizações</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.searchBox}>
+              <FontAwesome name="search" size={15} color={colors.muted} />
+              <TextInput
+                placeholder="Buscar por obra ou responsável"
+                placeholderTextColor="#9AA9A2"
+                value={search}
+                onChangeText={setSearch}
+                style={styles.searchInput}
+                returnKeyType="search"
+              />
+              {!!search && <TouchableOpacity onPress={() => setSearch("")}><FontAwesome name="times-circle" size={16} color={colors.muted} /></TouchableOpacity>}
+            </View>
+
+            {!!error && (
+              <View style={styles.errorBox}>
+                <FontAwesome name="wifi" size={16} color={colors.danger} />
+                <View style={styles.errorContent}><Text style={styles.errorTitle}>Não foi possível atualizar</Text><Text style={styles.errorText}>{error}</Text></View>
+                <TouchableOpacity onPress={() => void fetchObras(true)}><Text style={styles.retry}>Tentar</Text></TouchableOpacity>
+              </View>
+            )}
+          </View>
+        }
+        ListEmptyComponent={
+          loading ? <ActivityIndicator size="large" color={colors.primary} style={styles.loader} /> :
+          <View style={styles.empty}>
+            <View style={styles.emptyIcon}><FontAwesome name="folder-open-o" size={30} color={colors.primary} /></View>
+            <Text style={styles.emptyTitle}>{search ? "Nenhuma obra encontrada" : "Comece seu cadastro"}</Text>
+            <Text style={styles.emptyText}>{search ? "Tente buscar por outro termo." : "Cadastre a primeira obra para acompanhar sua evolução."}</Text>
+          </View>
+        }
+      />
+
+      <TouchableOpacity style={styles.fab} onPress={() => router.push("/obras/nova")} activeOpacity={0.9}>
+        <FontAwesome name="plus" size={18} color="#fff" />
+        <Text style={styles.fabText}>Nova obra</Text>
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#f7f7f7",
-    padding: 10,
-    borderRadius: 8,
-    marginBottom: 12,
-    elevation: 2,
-    shadowColor: "#222",
-    shadowOpacity: 0.07,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 2 },
-  },
-  img: {
-    width: 62,
-    height: 62,
-    borderRadius: 8,
-    marginRight: 12,
-    backgroundColor: "#eee",
-  },
-  noImg: {
-    width: 62,
-    height: 62,
-    borderRadius: 8,
-    marginRight: 12,
-    backgroundColor: "#ddd",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  nome: {
-    fontWeight: "bold",
-    fontSize: 17,
-    marginBottom: 2,
-  },
-  resp: {
-    fontSize: 14,
-    color: "#666",
-    marginBottom: 1,
-  },
-  datas: {
-    fontSize: 12,
-    color: "#999",
-  },
-  fab: {
-    position: "absolute",
-    bottom: 28,
-    right: 28,
-    backgroundColor: "#27ae60",
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    alignItems: "center",
-    justifyContent: "center",
-    elevation: 4,
-  },
-  titleRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 18,
-  },
-  link: { color: "#2980b9", fontWeight: "bold" },
-  actions: { flexDirection: "row", gap: 14 },
-  logout: { color: "#c0392b", fontWeight: "bold" },
+  safeArea: { flex: 1, backgroundColor: colors.background },
+  listContent: { padding: 20, paddingBottom: 112 },
+  header: { flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 22 },
+  eyebrow: { color: colors.primaryDark, fontSize: 11, fontWeight: "800", letterSpacing: 1.4, marginBottom: 6 },
+  heading: { color: colors.ink, fontSize: 30, fontWeight: "800", letterSpacing: -0.7 },
+  subtitle: { color: colors.muted, fontSize: 14, marginTop: 5 },
+  logoutButton: { alignItems: "center", backgroundColor: colors.surface, borderColor: colors.border, borderRadius: 22, borderWidth: 1, height: 44, justifyContent: "center", width: 44 },
+  summary: { alignItems: "center", backgroundColor: colors.surface, borderColor: colors.border, borderRadius: 18, borderWidth: 1, flexDirection: "row", marginBottom: 28, padding: 17 },
+  summaryIcon: { alignItems: "center", backgroundColor: "#E7F6EE", borderRadius: 12, height: 42, justifyContent: "center", marginRight: 12, width: 42 },
+  summaryValue: { color: colors.ink, fontSize: 21, fontWeight: "800" },
+  summaryLabel: { color: colors.muted, fontSize: 12, marginTop: 2 },
+  summaryDivider: { backgroundColor: colors.border, height: 36, marginHorizontal: 18, width: 1 },
+  sectionHeader: { alignItems: "center", flexDirection: "row", justifyContent: "space-between", marginBottom: 12 },
+  sectionTitle: { color: colors.ink, fontSize: 19, fontWeight: "800" },
+  link: { color: colors.primaryDark, fontSize: 13, fontWeight: "700" },
+  searchBox: { alignItems: "center", backgroundColor: colors.surface, borderColor: colors.border, borderRadius: 12, borderWidth: 1, flexDirection: "row", marginBottom: 16, paddingHorizontal: 14 },
+  searchInput: { color: colors.ink, flex: 1, fontSize: 14, paddingHorizontal: 10, paddingVertical: 12 },
+  errorBox: { alignItems: "center", backgroundColor: "#FFF1F1", borderRadius: 12, flexDirection: "row", marginBottom: 16, padding: 12 },
+  errorContent: { flex: 1, marginHorizontal: 10 },
+  errorTitle: { color: colors.danger, fontSize: 13, fontWeight: "800" },
+  errorText: { color: "#8A4A4D", fontSize: 12, marginTop: 2 },
+  retry: { color: colors.danger, fontSize: 12, fontWeight: "800" },
+  card: { alignItems: "center", backgroundColor: colors.surface, borderColor: colors.border, borderRadius: 16, borderWidth: 1, flexDirection: "row", marginBottom: 12, padding: 10 },
+  image: { backgroundColor: "#EAF1ED", borderRadius: 12, height: 78, marginRight: 13, width: 78 },
+  imagePlaceholder: { alignItems: "center", backgroundColor: "#E7F6EE", borderRadius: 12, height: 78, justifyContent: "center", marginRight: 13, width: 78 },
+  cardBody: { flex: 1, minWidth: 0 },
+  cardTitleRow: { alignItems: "center", flexDirection: "row", justifyContent: "space-between" },
+  cardTitle: { color: colors.ink, flex: 1, fontSize: 16, fontWeight: "800", marginRight: 8 },
+  owner: { color: colors.muted, fontSize: 12, marginTop: 8 },
+  cardFooter: { alignItems: "center", flexDirection: "row", justifyContent: "space-between", marginTop: 12 },
+  date: { color: colors.muted, flex: 1, fontSize: 10 },
+  status: { alignItems: "center", borderRadius: 8, flexDirection: "row", paddingHorizontal: 7, paddingVertical: 5 },
+  statusText: { fontSize: 9, fontWeight: "800", marginLeft: 4 },
+  loader: { marginTop: 42 },
+  empty: { alignItems: "center", paddingHorizontal: 30, paddingTop: 42 },
+  emptyIcon: { alignItems: "center", backgroundColor: "#E7F6EE", borderRadius: 24, height: 64, justifyContent: "center", marginBottom: 14, width: 64 },
+  emptyTitle: { color: colors.ink, fontSize: 18, fontWeight: "800" },
+  emptyText: { color: colors.muted, fontSize: 13, lineHeight: 20, marginTop: 7, textAlign: "center" },
+  fab: { alignItems: "center", backgroundColor: colors.primaryDark, borderRadius: 27, bottom: 22, elevation: 5, flexDirection: "row", justifyContent: "center", paddingHorizontal: 20, paddingVertical: 15, position: "absolute", right: 20, shadowColor: "#0E4B32", shadowOffset: { height: 4, width: 0 }, shadowOpacity: 0.24, shadowRadius: 8 },
+  fabText: { color: "#fff", fontSize: 14, fontWeight: "800", marginLeft: 9 },
 });
