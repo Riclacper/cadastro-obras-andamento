@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Image, Text } from "react-native";
 import * as Progress from "react-native-progress";
 import { useRouter } from "expo-router";
+import { getAuthToken } from "@/utils/session";
 
 export default function SplashScreen() {
   const router = useRouter();
@@ -12,9 +13,10 @@ export default function SplashScreen() {
       setProgress((old) => {
         if (old < 1) return old + 0.01;
         clearInterval(interval);
-        setTimeout(() => {
-          router.replace("/(tabs)");
-        }, 1000);
+        void (async () => {
+          const token = await getAuthToken();
+          router.replace(token ? "/(tabs)" : "/login");
+        })();
         return 1;
       });
     }, 30);
