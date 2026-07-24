@@ -149,14 +149,14 @@ export default function DetalheObra() {
         <Text>Nenhuma fiscalização cadastrada.</Text>
       ) : (
         fiscalizacoes.map((f) => (
-          <View key={f._id} style={styles.fiscalCard}>
+            <TouchableOpacity key={f._id} style={styles.fiscalCard} onPress={() => router.push(`/fiscalizacoes/${f._id}`)}>
             <Text style={{ fontWeight: "bold" }}>{f.status} - {f.data.slice(0, 10)}</Text>
             <Text>{f.observacoes}</Text>
             {f.foto ? <Image source={{ uri: f.foto }} style={styles.fiscImg} /> : null}
             {f.localizacao
               ? <Text style={{ fontSize: 12, color: "#555" }}>Lat: {f.localizacao.lat} | Long: {f.localizacao.long}</Text>
               : null}
-          </View>
+          </TouchableOpacity>
         ))
       )}
 

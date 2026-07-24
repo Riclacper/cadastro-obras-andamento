@@ -67,7 +67,12 @@ export default function ListaObras() {
 
   return (
     <View style={{ flex: 1, padding: 18, backgroundColor: "#fff" }}>
-      <Text style={{ fontWeight: "bold", fontSize: 22, marginBottom: 18 }}>Obras cadastradas</Text>
+      <View style={styles.titleRow}>
+        <Text style={{ fontWeight: "bold", fontSize: 22 }}>Obras cadastradas</Text>
+        <TouchableOpacity onPress={() => router.push("/fiscalizacoes")}>
+          <Text style={styles.link}>Fiscalizações</Text>
+        </TouchableOpacity>
+      </View>
 
       {loading ? (
         <ActivityIndicator size="large" color="#2d7" style={{ marginTop: 32 }} />
@@ -150,4 +155,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     elevation: 4,
   },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 18,
+  },
+  link: { color: "#2980b9", fontWeight: "bold" },
 });
