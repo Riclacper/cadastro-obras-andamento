@@ -31,7 +31,7 @@ export function maskDdmm(value: string) {
 
 export function isoToDdmm(data: string) {
   // "2022-02-13" => "13/02/2022"
-  const partes = data.split("-");
+  const partes = data.slice(0, 10).split("-");
   if (partes.length === 3) {
     return `${partes[2]}/${partes[1]}/${partes[0]}`;
   }

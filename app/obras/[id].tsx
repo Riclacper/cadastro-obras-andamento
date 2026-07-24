@@ -108,8 +108,8 @@ export default function DetalheObra() {
         const data = await res.json();
         Alert.alert("Erro ao enviar e-mail", data.error || "");
       }
-    } catch {
-      Alert.alert("Erro ao enviar e-mail");
+    } catch (error) {
+      Alert.alert("Erro ao enviar relatório", error instanceof Error ? error.message : "Verifique a configuração de e-mail do backend.");
     }
     setSending(false);
   }
@@ -161,20 +161,20 @@ export default function DetalheObra() {
         ))
       )}
 
-      <View style={{ flexDirection: "row", justifyContent: "space-between", marginVertical: 18 }}>
-        <Button title="Editar" color="#2980b9" onPress={() => router.push(`/obras/editar/${obra._id}`)} />
-        <Button title="Nova Fiscalização" color="#27ae60" onPress={() => router.push({ pathname: "/fiscalizacoes/nova", params: { obraId: obra._id } })} />
+      <View style={styles.actionGrid}>
+        <TouchableOpacity style={[styles.actionButton, styles.blueAction]} onPress={() => router.push(`/obras/editar/${obra._id}`)}><Text style={styles.actionText}>Editar obra</Text></TouchableOpacity>
+        <TouchableOpacity style={[styles.actionButton, styles.greenAction]} onPress={() => router.push({ pathname: "/fiscalizacoes/nova", params: { obraId: obra._id } })}><Text style={styles.actionText}>Nova fiscalização</Text></TouchableOpacity>
       </View>
-      <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 18 }}>
-        <Button title="Enviar por E-mail" color="#e67e22" onPress={() => setModalEmail(true)} />
-        <Button title="Excluir" color="#c0392b" onPress={deletarObra} />
+      <View style={styles.actionGrid}>
+        <TouchableOpacity style={[styles.actionButton, styles.orangeAction]} onPress={() => setModalEmail(true)}><Text style={styles.actionText}>Gerar relatório</Text></TouchableOpacity>
+        <TouchableOpacity style={[styles.actionButton, styles.redAction]} onPress={deletarObra}><Text style={styles.actionText}>Excluir obra</Text></TouchableOpacity>
       </View>
 
       {/* Modal para digitar e-mail */}
       <Modal visible={modalEmail} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={{ fontWeight: "bold", fontSize: 16 }}>Enviar dados por e-mail</Text>
+            <Text style={{ fontWeight: "bold", fontSize: 16 }}>Gerar relatório por e-mail</Text>
             <TextInput
               style={styles.input}
               placeholder="Digite o e-mail"
@@ -201,7 +201,14 @@ const styles = StyleSheet.create({
   label: { fontWeight: "bold", marginTop: 8 },
   separador: { height: 1, backgroundColor: "#ddd", marginVertical: 12 },
   fiscalCard: { backgroundColor: "#f3f3f3", borderRadius: 7, padding: 10, marginBottom: 10 },
-  fiscImg: { width: 80, height: 60, borderRadius: 6, marginTop: 6 }
+  fiscImg: { width: 80, height: 60, borderRadius: 6, marginTop: 6 },
+  actionGrid: { flexDirection: "row", gap: 10, marginBottom: 10 },
+  actionButton: { alignItems: "center", borderRadius: 12, flex: 1, justifyContent: "center", minHeight: 52, paddingHorizontal: 8, paddingVertical: 10 },
+  actionText: { color: "#fff", fontSize: 13, fontWeight: "800", textAlign: "center" },
+  blueAction: { backgroundColor: "#2477A8" },
+  greenAction: { backgroundColor: "#168557" },
+  orangeAction: { backgroundColor: "#D97706" },
+  redAction: { backgroundColor: "#B83B45" }
   , modalOverlay: { flex: 1, backgroundColor: "#0008", alignItems: "center", justifyContent: "center" },
   modalContent: { backgroundColor: "#fff", padding: 24, borderRadius: 8, width: "85%" },
   input: { borderWidth: 1, borderColor: "#ccc", borderRadius: 5, padding: 10, marginVertical: 12 }
