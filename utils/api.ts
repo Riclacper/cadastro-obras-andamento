@@ -1,4 +1,5 @@
 import { API_URL } from "@/constants/env";
+import { clearAuthToken, getAuthToken } from "@/utils/session";
 
 export class ApiError extends Error {
   status: number;
@@ -12,10 +13,20 @@ export class ApiError extends Error {
 
 /** Send a request to the configured backend and fail consistently on HTTP errors. */
 export async function apiFetch(path: string, init?: RequestInit): Promise<Response> {
-  const response = await fetch(`${API_URL}${path}`, init);
+  const token = await getAuthToken();
+  const headers = new Headers(init?.headers);
+  if (token) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+
+  const response = await fetch(`${API_URL}${path}`, { ...init, headers });
 
   if (response.ok) {
     return response;
+  }
+
+  if (response.status === 401) {
+    await clearAuthToken();
   }
 
   let message = `A API respondeu com erro ${response.status}.`;
