@@ -4,7 +4,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
 import { Picker } from "@react-native-picker/picker";
-import { ddmmToIso, isoToDdmm } from "../../../utils/formatDate";
+import { ddmmToIso, isValidDdmm, isoToDdmm } from "../../../utils/formatDate";
 import Header from "../../../components/Header";
 import { StyleSheet } from "react-native";
 import { apiFetch } from "@/utils/api";
@@ -100,6 +100,10 @@ export default function EditarFiscalizacao() {
   async function atualizarFiscalizacao() {
     if (!obraId || !data || !status || !observacoes) {
       Alert.alert("Preencha todos os campos obrigatórios!");
+      return;
+    }
+    if (!isValidDdmm(data)) {
+      Alert.alert("Informe uma data válida no formato DD-MM-YYYY.");
       return;
     }
     setSalvando(true);

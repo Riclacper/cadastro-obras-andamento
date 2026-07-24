@@ -1,12 +1,25 @@
 // utils/formatDate.ts
 export function ddmmToIso(data: string) {
-  // Aceita "13-02-2022" OU "13/02/2022"
-  const clean = data.replace(/\//g, "-"); // troca barras por traços
+  const clean = data.trim().replace(/\//g, "-");
   const partes = clean.split("-");
-  if (partes.length === 3) {
-    return `${partes[2]}-${partes[1]}-${partes[0]}`;
+  if (partes.length === 3 && isValidDdmm(clean)) {
+    const [dia, mes, ano] = partes;
+    return `${ano}-${mes}-${dia}`;
   }
   return data;
+}
+
+export function isValidDdmm(data: string) {
+  const match = data.trim().match(/^(\d{2})[-/](\d{2})[-/](\d{4})$/);
+  if (!match) return false;
+
+  const [, dia, mes, ano] = match;
+  const date = new Date(Date.UTC(Number(ano), Number(mes) - 1, Number(dia)));
+  return (
+    date.getUTCFullYear() === Number(ano) &&
+    date.getUTCMonth() === Number(mes) - 1 &&
+    date.getUTCDate() === Number(dia)
+  );
 }
 
 export function isoToDdmm(data: string) {

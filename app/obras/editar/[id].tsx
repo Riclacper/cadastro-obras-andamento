@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, Image, Alert, ScrollView, Acti
 import { useLocalSearchParams, useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
-import { ddmmToIso, isoToDdmm } from "../../../utils/formatDate";
+import { ddmmToIso, isValidDdmm, isoToDdmm } from "../../../utils/formatDate";
 import Header from "../../../components/Header";
 import { StyleSheet } from "react-native";
 import { apiFetch } from "@/utils/api";
@@ -89,6 +89,14 @@ export default function EditarObra() {
   async function atualizarObra() {
     if (!nome || !responsavel || !dataInicio || !dataFim || !descricao) {
       Alert.alert("Preencha todos os campos obrigatórios!");
+      return;
+    }
+    if (!isValidDdmm(dataInicio) || !isValidDdmm(dataFim)) {
+      Alert.alert("Informe datas válidas no formato DD-MM-YYYY.");
+      return;
+    }
+    if (ddmmToIso(dataInicio) > ddmmToIso(dataFim)) {
+      Alert.alert("A data de término deve ser igual ou posterior à data de início.");
       return;
     }
     setSalvando(true);

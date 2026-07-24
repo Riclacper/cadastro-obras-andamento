@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Image, Alert, ScrollView } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
-import { ddmmToIso } from "../../utils/formatDate";
+import { ddmmToIso, isValidDdmm } from "../../utils/formatDate";
 import Header from "../../components/Header";
 import { StyleSheet } from "react-native";
 import { apiFetch } from "@/utils/api";
@@ -61,6 +61,14 @@ export default function NovaObra() {
   async function cadastrarObra() {
     if (!nome || !responsavel || !dataInicio || !dataFim || !descricao) {
       Alert.alert("Preencha todos os campos obrigatórios!");
+      return;
+    }
+    if (!isValidDdmm(dataInicio) || !isValidDdmm(dataFim)) {
+      Alert.alert("Informe datas válidas no formato DD-MM-YYYY.");
+      return;
+    }
+    if (ddmmToIso(dataInicio) > ddmmToIso(dataFim)) {
+      Alert.alert("A data de término deve ser igual ou posterior à data de início.");
       return;
     }
     setLoading(true);
