@@ -1,132 +1,107 @@
-# 📱 Cadastro de Obras em Andamento – App Mobile
+# Cadastro de Obras — aplicativo mobile
 
-Aplicativo em **React Native + Expo + TypeScript** para cadastro, acompanhamento e fiscalização de obras públicas.  
-Permite registrar obras, fiscalizações, anexar fotos, localização por GPS, e enviar relatórios por e-mail.
+Aplicativo em React Native, Expo e TypeScript para cadastro, acompanhamento e fiscalização de obras públicas. O app consome a API REST do repositório [cadastro-obras-backend](https://github.com/Riclacper/cadastro-obras-backend).
 
----
+## Requisitos
 
-## 🚀 Tecnologias Utilizadas
+- Node.js 20.19.4 ou superior recomendado
+- Expo Go compatível com SDK 54
+- Backend em execução e acessível pela rede
+- iPhone e computador na mesma rede Wi-Fi para testes em rede local
 
-- [Expo](https://expo.dev/) (Managed Workflow)
-- React Native
-- TypeScript
-- @react-native-picker/picker
-- expo-image-picker, expo-location, expo-router
-- react-native-progress
-- Integração com backend Node.js + MongoDB via REST API
-
----
-
-## 📲 Como rodar o app
-
-### Pré-requisitos
-- Node.js (>=18)
-- Expo CLI (`npm install -g expo-cli`)
-- Conta no [Expo Go](https://expo.dev/expo-go) (App para testar no celular)
-- Backend rodando (veja documentação do backend)
-
-### Instale as dependências
+## Instalação
 
 ```bash
 npm install
-```
-
-### Configure a API
-
-Copie o arquivo de exemplo e informe a URL do backend:
-
-```bash
 cp .env.example .env
 ```
 
-Edite `.env`:
+Edite `.env` e informe o IP local do computador:
 
 ```env
 EXPO_PUBLIC_API_URL=http://SEU_IP_LOCAL:5000
 ```
 
-Em um celular físico, `SEU_IP_LOCAL` deve ser o IP do computador na mesma rede
-Wi-Fi do aparelho. Não é necessário alterar arquivos `.tsx`.
+Exemplo:
 
-### Inicie o projeto
+```env
+EXPO_PUBLIC_API_URL=http://192.168.18.34:5000
+```
+
+O arquivo `.env` é local e não deve ser versionado. Para produção, use uma URL HTTPS.
+
+## Executar
+
+Inicie o backend em outro terminal:
 
 ```bash
-npx expo start
+cd ../cadastro-obras-backend
+npm install
+npm start
 ```
 
-* Faça login no **Expo Go** do seu celular com a mesma conta Expo.
-* O projeto aparece em “Projetos” no Expo Go, basta tocar (sem precisar escanear QR code, se estiver logado).
-* Ou use o QR code normalmente.
+Depois, na raiz deste projeto:
 
----
-
-## 🛠️ Funcionalidades
-
-* **Splash personalizada** com logo e barra de progresso animada.
-* **Cadastro de Obras:** nome, responsável, datas, descrição, foto (câmera), localização via GPS.
-* **Listagem de Obras:** com “pull to refresh” (puxar para atualizar) e botão flutuante para adicionar nova.
-* **Detalhes da Obra:** dados completos, foto, localização, fiscalizações associadas.
-* **Cadastro e edição de Fiscalizações:** data, status, observações, foto, localização, obra vinculada.
-* **Envio de relatório por e-mail:** envia todos os dados para o endereço escolhido.
-* **Visual moderno e responsivo, com botões arredondados e ícones.**
-* **Compatível com tema claro e escuro.**
-* **Fluxo 100% integrado ao backend**.
-
----
-
-## 📦 Estrutura de Pastas
-
+```bash
+npx expo start -c
 ```
+
+Escaneie o QR code com o Expo Go. Em um aparelho físico, o Expo e o backend precisam estar acessíveis pelo mesmo computador. Se a rede local bloquear o Metro, tente `npx expo start --tunnel`; a API ainda deve permanecer acessível pelo IP configurado em `EXPO_PUBLIC_API_URL`.
+
+Antes de abrir o app, é possível testar o backend no navegador do computador ou do iPhone:
+
+```text
+http://SEU_IP_LOCAL:5000/
+```
+
+## Autenticação
+
+Ao abrir o app pela primeira vez, crie um usuário pela API ou use um usuário existente. O login do app envia `email` e `senha` para `POST /auth/login`, armazena o token localmente e protege as rotas internas. O botão **Sair** remove a sessão e retorna à tela de login.
+
+O primeiro usuário cadastrado no backend recebe o papel `admin`; os próximos recebem `fiscal`.
+
+## Funcionalidades
+
+- Cadastro, edição, detalhes e listagem de obras
+- Fiscalizações associadas às obras
+- Fotos pela câmera ou galeria
+- Localização por GPS
+- Validação de datas e atualização por pull-to-refresh
+- Envio de detalhes da obra por e-mail
+- Splash screen, navegação protegida e suporte a tema claro/escuro
+
+## Estrutura principal
+
+```text
 app/
-  ├── obras/
-  │     ├── index.tsx         # Listagem de obras (com refresh)
-  │     ├── nova.tsx          # Cadastro de obra
-  │     ├── [id].tsx          # Detalhes da obra
-  │     └── editar/[id].tsx   # Edição de obra
-  ├── fiscalizacoes/
-  │     ├── nova.tsx          # Cadastro de fiscalização
-  │     ├── editar/[id].tsx   # Edição de fiscalização
-  │     └── ...
-  ├── components/
-  │     └── Header.tsx        # Componente da logo
-  ├── assets/
-  │     └── images/logo.png   # Logo do app
-  ├── utils/
-  │     └── formatDate.ts     # Funções para datas
-  ├── SplashScreen.tsx        # Splash personalizada com barra
-  ├── index.tsx               # Exporta SplashScreen como tela inicial
-  ├── (tabs)/                 # Rotas de abas do app
-  ...
+├── _layout.tsx                 # Navegação e proteção de rotas
+├── login.tsx                   # Login
+├── SplashScreen.tsx            # Tela inicial
+├── (tabs)/                     # Abas principais
+├── obras/                      # CRUD de obras
+└── fiscalizacoes/              # CRUD de fiscalizações
+components/                     # Componentes reutilizáveis
+constants/env.ts                # Configuração da API
+utils/api.ts                    # Cliente HTTP autenticado
+utils/session.ts                # Sessão local
+utils/formatDate.ts             # Validação e formatação de datas
 ```
 
----
+## Testes e verificações
 
-## 💡 Observações
+```bash
+npx tsc --noEmit
+npx jest --runInBand --watchman=false --watch=false
+```
 
-* **Datas:** preencha sempre como `DD-MM-YYYY` ou `DD/MM/YYYY` (app converte automaticamente para ISO).
-* **Permissões:** o app solicita acesso à câmera e localização quando necessário.
-* **API Backend:** o app espera que o backend (Node.js/MongoDB) esteja rodando e acessível na mesma rede.
-* **Configuração:** a URL é lida de `EXPO_PUBLIC_API_URL`; o arquivo `.env` não deve ser versionado.
-* **Autenticação:** o app usa `POST /auth/login` com `{ email, senha }`; o backend deve retornar `{ token }` ou `{ accessToken }`.
-* **Sessão:** rotas internas exigem token; o botão “Sair” remove a sessão local e retorna ao login.
-* **Produção:** configure `EXPO_PUBLIC_API_URL` com uma URL `https://`. O fallback HTTP é destinado apenas ao desenvolvimento local.
-* **Atualização das listas:** basta puxar para baixo para atualizar as obras ou fiscalizações.
+## Solução de problemas
 
----
+- **QR code não conecta:** confirme a mesma rede Wi-Fi, reinicie com `npx expo start -c` e force o encerramento/reabertura do Expo Go.
+- **API não responde no iPhone:** abra `http://IP_DO_COMPUTADOR:5000/` no Safari. Se não abrir, verifique firewall e a rede local.
+- **Erro de bundle ou módulo:** pare o Metro com `Ctrl+C`, execute `npm install` e inicie novamente com cache limpo.
+- **Aviso do Watchman:** mensagens sobre `MustScanSubDirs` são avisos do monitor de arquivos; o erro relevante normalmente aparece depois delas.
+- **Versão do Node:** versões inferiores à recomendada podem gerar avisos ou incompatibilidades durante a instalação do SDK 54.
 
-## 📸 Prints de Telas
+## Licença
 
-> Inclua prints das principais telas: splash personalizada, cadastro, listagem, detalhes, envio de e-mail, etc.
-
----
-
-## 👨‍💻 Autor
-
-Desenvolvido por **Ricardo Lacerda**
-Orientação acadêmica: **Geraldo Gomes**
-
----
-
-## 📚 Licença
-
-Este projeto é para fins acadêmicos e didáticos.
+Projeto acadêmico e didático desenvolvido por Ricardo Lacerda Pereira.
