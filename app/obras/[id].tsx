@@ -140,19 +140,19 @@ export default function DetalheObra() {
         ? <Text>Lat: {obra.localizacao.lat} | Long: {obra.localizacao.long}</Text>
         : <Text>Não informada</Text>}
 
-      <Text style={styles.label}>Descrição:</Text>
+      <Text style={styles.label}>Descrição da obra:</Text>
       <Text>{obra.descricao}</Text>
 
       <View style={styles.separador} />
 
-      <Text style={[styles.label, { fontSize: 18 }]}>Fiscalizações</Text>
+      <Text style={[styles.label, { fontSize: 18 }]}>Fiscalizações da obra</Text>
       {fiscalizacoes.length === 0 ? (
         <Text>Nenhuma fiscalização cadastrada.</Text>
       ) : (
         fiscalizacoes.map((f) => (
             <TouchableOpacity key={f._id} style={styles.fiscalCard} onPress={() => router.push(`/fiscalizacoes/${f._id}`)}>
             <Text style={{ fontWeight: "bold" }}>{f.status} - {f.data.slice(0, 10)}</Text>
-            <Text>{f.observacoes}</Text>
+            <Text style={styles.observationLabel}>Observações: <Text style={styles.observation}>{f.observacoes}</Text></Text>
             {f.foto ? <Image source={{ uri: f.foto }} style={styles.fiscImg} /> : null}
             {f.localizacao
               ? <Text style={{ fontSize: 12, color: "#555" }}>Lat: {f.localizacao.lat} | Long: {f.localizacao.long}</Text>
@@ -201,6 +201,8 @@ const styles = StyleSheet.create({
   label: { fontWeight: "bold", marginTop: 8 },
   separador: { height: 1, backgroundColor: "#ddd", marginVertical: 12 },
   fiscalCard: { backgroundColor: "#f3f3f3", borderRadius: 7, padding: 10, marginBottom: 10 },
+  observationLabel: { color: "#183B56", fontSize: 12, fontWeight: "800", marginTop: 4 },
+  observation: { color: "#333", fontWeight: "400" },
   fiscImg: { width: 80, height: 60, borderRadius: 6, marginTop: 6 },
   actionGrid: { flexDirection: "row", gap: 10, marginBottom: 10 },
   actionButton: { alignItems: "center", borderRadius: 12, flex: 1, justifyContent: "center", minHeight: 52, paddingHorizontal: 8, paddingVertical: 10 },
