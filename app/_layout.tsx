@@ -56,7 +56,7 @@ function RootLayoutNav() {
     void getAuthToken().then((token) => {
       if (!active) return;
       const currentRoute = segments[0];
-      const publicRoute = !currentRoute || currentRoute === 'index' || currentRoute === 'login';
+      const publicRoute = !currentRoute || currentRoute === 'login';
 
       if (!token && !publicRoute) {
         router.replace('/login');
@@ -72,7 +72,7 @@ function RootLayoutNav() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
+      <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />

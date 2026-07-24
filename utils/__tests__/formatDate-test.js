@@ -13,6 +13,6 @@ describe('formatDate', () => {
   });
 
   it('converte datas ISO para o formato exibido', () => {
-    expect(isoToDdmm('2022-02-13')).toBe('13-02-2022');
+    expect(isoToDdmm('2022-02-13')).toBe('13/02/2022');
   });
 });

@@ -22,11 +22,18 @@ export function isValidDdmm(data: string) {
   );
 }
 
+export function maskDdmm(value: string) {
+  const digits = value.replace(/\D/g, "").slice(0, 8);
+  if (digits.length <= 2) return digits;
+  if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+}
+
 export function isoToDdmm(data: string) {
-  // "2022-02-13" => "13-02-2022"
+  // "2022-02-13" => "13/02/2022"
   const partes = data.split("-");
   if (partes.length === 3) {
-    return `${partes[2]}-${partes[1]}-${partes[0]}`;
+    return `${partes[2]}/${partes[1]}/${partes[0]}`;
   }
   return data;
 }
