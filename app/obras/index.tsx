@@ -49,10 +49,10 @@ function formatDate(value?: string) {
 }
 
 function getStatus(statusValue?: string, dataFim?: string) {
-  if (statusValue === "Concluída") return { label: "Concluída", color: colors.primary, icon: "check-circle" as const };
-  if (statusValue === "Pausada") return { label: "Pausada", color: colors.warning, icon: "pause-circle" as const };
-  if (statusValue === "Planejada") return { label: "Planejada", color: "#64748B", icon: "calendar-o" as const };
-  if (statusValue === "Em andamento") return { label: "Em andamento", color: colors.primary, icon: "check-circle-o" as const };
+  if (statusValue === "Concluída") return { label: "Concluída", color: "#168557", icon: "check-circle" as const };
+  if (statusValue === "Pausada") return { label: "Pausada", color: "#B83B45", icon: "pause-circle" as const };
+  if (statusValue === "Planejada") return { label: "Planejada", color: "#2477A8", icon: "calendar-o" as const };
+  if (statusValue === "Em andamento") return { label: "Em andamento", color: "#D97706", icon: "clock-o" as const };
   if (!dataFim) return { label: "Sem prazo", color: colors.muted, icon: "calendar-o" as const };
   const end = new Date(dataFim);
   const today = new Date();

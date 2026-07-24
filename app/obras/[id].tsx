@@ -25,6 +25,13 @@ interface Fiscalizacao {
   localizacao?: { lat: number; long: number };
 }
 
+function statusColor(status?: string) {
+  if (status === "Concluída") return "#168557";
+  if (status === "Pausada") return "#B83B45";
+  if (status === "Planejada") return "#2477A8";
+  return "#D97706";
+}
+
 export default function DetalheObra() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
@@ -137,7 +144,9 @@ export default function DetalheObra() {
       </Text>
 
       <Text style={styles.label}>Status da obra:</Text>
-      <Text>{obra.status || "Em andamento"}</Text>
+      <View style={[styles.statusBadge, { backgroundColor: `${statusColor(obra.status)}18` }]}>
+        <Text style={[styles.statusText, { color: statusColor(obra.status) }]}>{obra.status || "Em andamento"}</Text>
+      </View>
 
       <Text style={styles.label}>Localização:</Text>
       {obra.localizacao
@@ -207,6 +216,8 @@ const styles = StyleSheet.create({
   fiscalCard: { backgroundColor: "#f3f3f3", borderRadius: 7, padding: 10, marginBottom: 10 },
   observationLabel: { color: "#183B56", fontSize: 12, fontWeight: "800", marginTop: 4 },
   observation: { color: "#333", fontWeight: "400" },
+  statusBadge: { alignSelf: "flex-start", borderRadius: 9, marginTop: 2, paddingHorizontal: 10, paddingVertical: 6 },
+  statusText: { fontSize: 13, fontWeight: "800" },
   fiscImg: { width: 80, height: 60, borderRadius: 6, marginTop: 6 },
   actionGrid: { flexDirection: "row", gap: 10, marginBottom: 10 },
   actionButton: { alignItems: "center", borderRadius: 12, flex: 1, justifyContent: "center", minHeight: 52, paddingHorizontal: 8, paddingVertical: 10 },
