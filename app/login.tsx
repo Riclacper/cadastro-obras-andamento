@@ -17,6 +17,7 @@ import { apiFetch } from "@/utils/api";
 import { setAuthToken, setAuthUser } from "@/utils/session";
 
 const colors = { ink: "#183B56", muted: "#718096", primary: "#1F9D68", primaryDark: "#147A50", background: "#F4F8F6", surface: "#FFFFFF", border: "#DDEAE3" };
+const webInputStyle = Platform.OS === "web" ? ({ outlineStyle: "none" } as any) : undefined;
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -74,7 +75,7 @@ export default function LoginScreen() {
         <View style={[styles.inputWrap, focusedField === "email" && styles.inputWrapFocused]}>
           <FontAwesome name="envelope-o" size={16} color={colors.muted} />
           <TextInput
-            style={styles.input}
+            style={[styles.input, webInputStyle]}
             placeholder="seu@email.com"
             placeholderTextColor="#A1B0A8"
             value={email}
@@ -91,7 +92,7 @@ export default function LoginScreen() {
         <View style={[styles.inputWrap, focusedField === "senha" && styles.inputWrapFocused]}>
           <FontAwesome name="lock" size={18} color={colors.muted} />
           <TextInput
-            style={styles.input}
+            style={[styles.input, webInputStyle]}
             placeholder="Digite sua senha"
             placeholderTextColor="#A1B0A8"
             value={senha}
