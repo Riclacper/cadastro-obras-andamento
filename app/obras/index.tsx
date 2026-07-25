@@ -175,10 +175,10 @@ export default function ListaObras() {
         ListHeaderComponent={
           <View>
             <View style={styles.header}>
-              <View>
+              <View style={styles.headerCopy}>
                 <Text style={styles.eyebrow}>PAINEL DE CONTROLE</Text>
                 <Text style={styles.heading}>Olá, fiscal 👋</Text>
-                <Text style={styles.subtitle}>Acompanhe suas obras em um só lugar.</Text>
+                <Text style={styles.subtitle} numberOfLines={2}>Acompanhe suas obras em um só lugar.</Text>
               </View>
               <View style={styles.headerActions}>
                 {isAdmin && <TouchableOpacity style={styles.teamButton} onPress={() => router.push("/usuarios")}><FontAwesome name="users" size={14} color={colors.primaryDark} /><Text style={styles.teamText}>Equipe</Text></TouchableOpacity>}
@@ -253,10 +253,11 @@ export default function ListaObras() {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: colors.background },
   listContent: { padding: 20, paddingBottom: 112 },
-  header: { flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 22 },
-  headerActions: { alignItems: "center", flexDirection: "row", gap: 8 },
-  teamButton: { alignItems: "center", backgroundColor: "#E7F6EE", borderRadius: 18, flexDirection: "row", paddingHorizontal: 10, paddingVertical: 9 },
-  teamText: { color: colors.primaryDark, fontSize: 11, fontWeight: "800", marginLeft: 5 },
+  header: { alignItems: "flex-start", flexDirection: "row", justifyContent: "space-between", marginBottom: 22 },
+  headerCopy: { flex: 1, minWidth: 0, paddingRight: 10 },
+  headerActions: { alignItems: "center", flexDirection: "row", flexShrink: 0, gap: 6 },
+  teamButton: { alignItems: "center", backgroundColor: "#E7F6EE", borderRadius: 18, flexDirection: "row", paddingHorizontal: 8, paddingVertical: 9 },
+  teamText: { color: colors.primaryDark, fontSize: 10, fontWeight: "800", marginLeft: 4 },
   eyebrow: { color: colors.primaryDark, fontSize: 11, fontWeight: "800", letterSpacing: 1.4, marginBottom: 6 },
   heading: { color: colors.ink, fontSize: 30, fontWeight: "800", letterSpacing: -0.7 },
   subtitle: { color: colors.muted, fontSize: 14, marginTop: 5 },
