@@ -257,7 +257,7 @@ export default function ListaObras() {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: colors.background },
-  listContent: { padding: 20, paddingBottom: 112 },
+  listContent: { alignSelf: "center", maxWidth: 1280, padding: 20, paddingBottom: 112, width: "100%" },
   header: { alignItems: "flex-start", flexDirection: "row", justifyContent: "space-between", marginBottom: 22 },
   headerCopy: { flex: 1, minWidth: 0, paddingRight: 10 },
   headerActions: { alignItems: "center", flexDirection: "row", flexShrink: 0, gap: 6 },
