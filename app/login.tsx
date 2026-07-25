@@ -24,6 +24,7 @@ export default function LoginScreen() {
   const [senha, setSenha] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [focusedField, setFocusedField] = useState<"email" | "senha" | null>(null);
 
   async function entrar() {
     if (!email.trim() || !senha) {
@@ -70,7 +71,7 @@ export default function LoginScreen() {
 
       <View style={styles.form}>
         <Text style={styles.label}>E-mail</Text>
-        <View style={styles.inputWrap}>
+        <View style={[styles.inputWrap, focusedField === "email" && styles.inputWrapFocused]}>
           <FontAwesome name="envelope-o" size={16} color={colors.muted} />
           <TextInput
             style={styles.input}
@@ -78,6 +79,8 @@ export default function LoginScreen() {
             placeholderTextColor="#A1B0A8"
             value={email}
             onChangeText={setEmail}
+            onFocus={() => setFocusedField("email")}
+            onBlur={() => setFocusedField(null)}
             autoCapitalize="none"
             autoCorrect={false}
             keyboardType="email-address"
@@ -85,7 +88,7 @@ export default function LoginScreen() {
           />
         </View>
         <Text style={styles.label}>Senha</Text>
-        <View style={styles.inputWrap}>
+        <View style={[styles.inputWrap, focusedField === "senha" && styles.inputWrapFocused]}>
           <FontAwesome name="lock" size={18} color={colors.muted} />
           <TextInput
             style={styles.input}
@@ -93,6 +96,8 @@ export default function LoginScreen() {
             placeholderTextColor="#A1B0A8"
             value={senha}
             onChangeText={setSenha}
+            onFocus={() => setFocusedField("senha")}
+            onBlur={() => setFocusedField(null)}
             secureTextEntry={!showPassword}
             editable={!loading}
           />
@@ -118,6 +123,7 @@ const styles = StyleSheet.create({
   form: { alignSelf: "center", backgroundColor: colors.surface, borderColor: colors.border, borderRadius: 20, borderWidth: 1, marginTop: 30, maxWidth: 560, padding: 20, width: "100%" },
   label: { color: colors.ink, fontSize: 12, fontWeight: "800", marginBottom: 7, marginTop: 4 },
   inputWrap: { alignItems: "center", borderColor: colors.border, borderRadius: 11, borderWidth: 1, flexDirection: "row", marginBottom: 15, paddingHorizontal: 13 },
+  inputWrapFocused: { borderColor: colors.primary, borderWidth: 2, shadowColor: colors.primary, shadowOpacity: 0.12, shadowRadius: 4 },
   input: { color: colors.ink, flex: 1, fontSize: 15, paddingHorizontal: 10, paddingVertical: 13 },
   button: { alignItems: "center", backgroundColor: colors.primaryDark, borderRadius: 11, flexDirection: "row", justifyContent: "center", marginTop: 5, padding: 15 },
   buttonText: { color: "#fff", fontSize: 15, fontWeight: "800", marginRight: 10 },
