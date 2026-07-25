@@ -70,8 +70,8 @@ export default function LoginScreen() {
     >
       <Image source={require("../assets/images/logo.png")} style={styles.logo} resizeMode="contain" accessibilityLabel="Logo Cadastro de Obras" />
       <Text style={styles.kicker}>GESTÃO INTELIGENTE</Text>
-      <Text style={[styles.title, { fontSize: viewportWidth < 480 ? 28 : 30, maxWidth: contentWidth }]}>Cadastro de Obras</Text>
-      <Text style={[styles.subtitle, { maxWidth: contentWidth }]}>Acompanhe projetos, prazos e fiscalizações em um só lugar.</Text>
+      <Text style={[styles.title, { alignSelf: "center", fontSize: viewportWidth < 480 ? 28 : 30, maxWidth: contentWidth, width: "100%" }]}>Cadastro de Obras</Text>
+      <Text style={[styles.subtitle, { alignSelf: "center", maxWidth: contentWidth, width: "100%" }]}>Acompanhe projetos, prazos e fiscalizações em um só lugar.</Text>
 
       <View style={[styles.form, { width: contentWidth }]}>
         <Text style={styles.label}>E-mail</Text>
