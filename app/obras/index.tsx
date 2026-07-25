@@ -79,6 +79,7 @@ export default function ListaObras() {
   const [search, setSearch] = useState("");
   const [error, setError] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
+  const [perfilLabel, setPerfilLabel] = useState("fiscal");
   const router = useRouter();
 
   const fetchObras = useCallback(async (initial = false) => {
@@ -100,7 +101,11 @@ export default function ListaObras() {
 
   useEffect(() => {
     void fetchObras(true);
-    void getAuthUser().then((user) => setIsAdmin(user?.role === "admin"));
+    void getAuthUser().then((user) => {
+      const admin = user?.role === "admin";
+      setIsAdmin(admin);
+      setPerfilLabel(admin ? "administrador" : "fiscal");
+    });
   }, [fetchObras]);
 
   const filteredObras = useMemo(() => {
@@ -177,7 +182,7 @@ export default function ListaObras() {
             <View style={styles.header}>
               <View style={styles.headerCopy}>
                 <Text style={styles.eyebrow}>PAINEL DE CONTROLE</Text>
-                <Text style={styles.heading}>Olá, fiscal 👋</Text>
+                <Text style={styles.heading}>Olá, {perfilLabel} 👋</Text>
                 <Text style={styles.subtitle} numberOfLines={2}>Acompanhe suas obras em um só lugar.</Text>
               </View>
               <View style={styles.headerActions}>
