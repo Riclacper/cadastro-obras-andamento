@@ -31,6 +31,14 @@ const responsiveBackground = `
 body {
   background-color: #fff;
 }
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #fff inset !important;
+  box-shadow: 0 0 0 1000px #fff inset !important;
+  -webkit-text-fill-color: #183B56 !important;
+}
 @media (prefers-color-scheme: dark) {
   body {
     background-color: #000;
