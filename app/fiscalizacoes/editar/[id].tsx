@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Image, Alert, ScrollView, ActivityIndicator, Modal } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
-import * as Location from "expo-location";
 import { ddmmToIso, isValidDdmm, isoToDdmm, maskDdmm } from "../../../utils/formatDate";
 import Header from "../../../components/Header";
 import { StyleSheet } from "react-native";
 import { apiFetch } from "@/utils/api";
+import { Localizacao, obterLocalizacaoAtual } from "@/utils/location";
 
 interface Obra {
   _id: string;
@@ -16,7 +16,7 @@ interface FiscalizacaoPayload {
   data: string;
   status: string;
   observacoes: string;
-  localizacao: { lat: number; long: number };
+  localizacao: Localizacao;
   foto: string;
   obra: string;
 }
@@ -33,7 +33,7 @@ export default function EditarFiscalizacao() {
   const [status, setStatus] = useState("");
   const [observacoes, setObservacoes] = useState("");
   const [foto, setFoto] = useState<string>("");
-  const [localizacao, setLocalizacao] = useState<{ lat: number; long: number }>({ lat: 0, long: 0 });
+  const [localizacao, setLocalizacao] = useState<Localizacao>({ lat: 0, long: 0 });
   const [selectingObra, setSelectingObra] = useState(false);
   const [selectingStatus, setSelectingStatus] = useState(false);
   const statusOptions = ["Em dia", "Atrasada", "Parada"];
@@ -88,16 +88,8 @@ export default function EditarFiscalizacao() {
   }
 
   async function obterLocalizacao() {
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert("Permissão negada para acessar localização!");
-      return;
-    }
-    let location = await Location.getCurrentPositionAsync({});
-    setLocalizacao({
-      lat: location.coords.latitude,
-      long: location.coords.longitude,
-    });
+    try { setLocalizacao(await obterLocalizacaoAtual()); }
+    catch (error) { Alert.alert("Não foi possível obter a localização", error instanceof Error ? error.message : "Tente novamente."); }
   }
 
   async function atualizarFiscalizacao() {
@@ -184,6 +176,8 @@ export default function EditarFiscalizacao() {
       {localizacao.lat !== 0 && (
         <Text style={{ marginBottom: 14, textAlign: "center" }}>
           Lat: {localizacao.lat.toFixed(5)} | Long: {localizacao.long.toFixed(5)}
+          {localizacao.endereco ? `\n${localizacao.endereco}` : ""}
+          {localizacao.precisao ? `\nPrecisão aproximada: ${localizacao.precisao} m` : ""}
         </Text>
       )}
       <TouchableOpacity style={styles.button} onPress={atualizarFiscalizacao} disabled={salvando}>

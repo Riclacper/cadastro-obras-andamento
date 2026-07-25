@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, Image, Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { apiFetch } from "@/utils/api";
 import Header from "../../components/Header";
 import { isoToDdmm } from "../../utils/formatDate";
 import { getAuthUser } from "@/utils/session";
+import type { Localizacao } from "@/utils/location";
 
 interface Fiscalizacao {
   _id: string;
@@ -13,7 +14,7 @@ interface Fiscalizacao {
   status: string;
   observacoes: string;
   foto?: string;
-  localizacao?: { lat: number; long: number };
+  localizacao?: Localizacao;
   obra?: string | { _id: string; nome: string };
 }
 
@@ -23,6 +24,10 @@ export default function DetalheFiscalizacao() {
   const [fiscalizacao, setFiscalizacao] = useState<Fiscalizacao | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+
+  function mapaUrl(localizacao: Localizacao) {
+    return localizacao.googleMapsUrl || `https://www.google.com/maps?q=${localizacao.lat},${localizacao.long}`;
+  }
 
   useEffect(() => {
     async function carregar() {
@@ -80,6 +85,10 @@ export default function DetalheFiscalizacao() {
         <>
           <Text style={styles.label}>Localização</Text>
           <Text>Lat: {fiscalizacao.localizacao.lat} | Long: {fiscalizacao.localizacao.long}</Text>
+          {fiscalizacao.localizacao.endereco && <Text>{fiscalizacao.localizacao.endereco}</Text>}
+          {fiscalizacao.localizacao.precisao && <Text>Precisão: aproximadamente {fiscalizacao.localizacao.precisao} m</Text>}
+          {fiscalizacao.localizacao.capturadoEm && <Text>Coletada em: {new Date(fiscalizacao.localizacao.capturadoEm).toLocaleString("pt-BR")}</Text>}
+          <TouchableOpacity onPress={() => void Linking.openURL(mapaUrl(fiscalizacao.localizacao!))}><Text style={styles.mapLink}>Abrir no Google Maps</Text></TouchableOpacity>
         </>
       )}
       {fiscalizacao.foto && <Image source={{ uri: fiscalizacao.foto }} style={styles.image} />}
@@ -102,6 +111,7 @@ const styles = StyleSheet.create({
   loading: { marginTop: 64 },
   label: { fontWeight: "bold", marginTop: 14, marginBottom: 3 },
   image: { width: "100%", height: 220, borderRadius: 8, marginTop: 18 },
+  mapLink: { color: "#2477A8", fontWeight: "800", marginTop: 4 },
   actions: { flexDirection: "row", gap: 10, marginTop: 28 },
   actionButton: { alignItems: "center", borderRadius: 12, flex: 1, flexDirection: "row", justifyContent: "center", minHeight: 52, paddingHorizontal: 10 },
   editButton: { backgroundColor: "#2477A8" },

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, ScrollView, Button, Alert, TouchableOpacity, ActivityIndicator, Modal, TextInput, StyleSheet } from "react-native";
+import { View, Text, Image, ScrollView, Button, Alert, TouchableOpacity, ActivityIndicator, Modal, TextInput, StyleSheet, Linking } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { apiFetch } from "@/utils/api";
 import Header from "../../components/Header";
 import { getAuthUser } from "@/utils/session";
+import type { Localizacao } from "@/utils/location";
 
 interface Obra {
   _id: string;
@@ -14,7 +15,7 @@ interface Obra {
   status?: string;
   descricao: string;
   foto?: string;
-  localizacao?: { lat: number; long: number };
+  localizacao?: Localizacao;
 }
 
 interface Fiscalizacao {
@@ -23,7 +24,7 @@ interface Fiscalizacao {
   status: string;
   observacoes: string;
   foto?: string;
-  localizacao?: { lat: number; long: number };
+  localizacao?: Localizacao;
 }
 
 function statusColor(status?: string) {
@@ -31,6 +32,10 @@ function statusColor(status?: string) {
   if (status === "Pausada") return "#B83B45";
   if (status === "Planejada") return "#2477A8";
   return "#D97706";
+}
+
+function mapaUrl(localizacao: Localizacao) {
+  return localizacao.googleMapsUrl || `https://www.google.com/maps?q=${localizacao.lat},${localizacao.long}`;
 }
 
 export default function DetalheObra() {
@@ -153,7 +158,7 @@ export default function DetalheObra() {
 
       <Text style={styles.label}>Localização:</Text>
       {obra.localizacao
-        ? <Text>Lat: {obra.localizacao.lat} | Long: {obra.localizacao.long}</Text>
+        ? <><Text>Lat: {obra.localizacao.lat} | Long: {obra.localizacao.long}</Text>{obra.localizacao.endereco && <Text>Endereço aproximado: {obra.localizacao.endereco}</Text>}{obra.localizacao.precisao && <Text>Precisão: aproximadamente {obra.localizacao.precisao} m</Text>}<TouchableOpacity onPress={() => void Linking.openURL(mapaUrl(obra.localizacao!))}><Text style={styles.mapLink}>Abrir no Google Maps</Text></TouchableOpacity></>
         : <Text>Não informada</Text>}
 
       <Text style={styles.label}>Descrição da obra:</Text>
@@ -172,7 +177,7 @@ export default function DetalheObra() {
             <Text style={styles.observationLabel}>Observações: <Text style={styles.observation}>{f.observacoes}</Text></Text>
             {f.foto ? <Image source={{ uri: f.foto }} style={styles.fiscImg} /> : null}
             {f.localizacao
-              ? <Text style={{ fontSize: 12, color: "#555" }}>Lat: {f.localizacao.lat} | Long: {f.localizacao.long}</Text>
+              ? <><Text style={{ fontSize: 12, color: "#555" }}>Lat: {f.localizacao.lat} | Long: {f.localizacao.long}</Text>{f.localizacao.endereco && <Text style={{ fontSize: 12, color: "#555" }}>{f.localizacao.endereco}</Text>}{f.localizacao.precisao && <Text style={{ fontSize: 12, color: "#555" }}>Precisão: {f.localizacao.precisao} m</Text>}</>
               : null}
           </TouchableOpacity>
           ))
@@ -217,6 +222,7 @@ const styles = StyleSheet.create({
   img: { width: "100%", height: 180, borderRadius: 8, marginBottom: 12 },
   semImg: { width: "100%", height: 180, borderRadius: 8, marginBottom: 12, backgroundColor: "#eee", alignItems: "center", justifyContent: "center" },
   label: { fontWeight: "bold", marginTop: 8 },
+  mapLink: { color: "#2477A8", fontWeight: "800", marginTop: 4 },
   separador: { height: 1, backgroundColor: "#ddd", marginVertical: 12 },
   fiscalCard: { backgroundColor: "#f3f3f3", borderRadius: 7, padding: 10, marginBottom: 10 },
   observationLabel: { color: "#183B56", fontSize: 12, fontWeight: "800", marginTop: 4 },

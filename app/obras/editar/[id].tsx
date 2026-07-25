@@ -2,16 +2,12 @@ import React, { useEffect, useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Image, Alert, ScrollView, ActivityIndicator, Modal } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
-import * as Location from "expo-location";
 import { ddmmToIso, isValidDdmm, isoToDdmm, maskDdmm } from "../../../utils/formatDate";
 import Header from "../../../components/Header";
 import { StyleSheet } from "react-native";
 import { apiFetch } from "@/utils/api";
+import { Localizacao, obterLocalizacaoAtual } from "@/utils/location";
 
-interface Localizacao {
-  lat: number;
-  long: number;
-}
 interface ObraPayload {
   nome: string;
   responsavel: string;
@@ -79,16 +75,8 @@ export default function EditarObra() {
   }
 
   async function obterLocalizacao() {
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert("Permissão negada para acessar localização!");
-      return;
-    }
-    let location = await Location.getCurrentPositionAsync({});
-    setLocalizacao({
-      lat: location.coords.latitude,
-      long: location.coords.longitude,
-    });
+    try { setLocalizacao(await obterLocalizacaoAtual()); }
+    catch (error) { Alert.alert("Não foi possível obter a localização", error instanceof Error ? error.message : "Tente novamente."); }
   }
 
   async function atualizarObra() {
@@ -175,6 +163,8 @@ export default function EditarObra() {
       {localizacao.lat !== 0 && (
         <Text style={{ marginBottom: 14, textAlign: "center" }}>
           Lat: {localizacao.lat.toFixed(5)} | Long: {localizacao.long.toFixed(5)}
+          {localizacao.endereco ? `\n${localizacao.endereco}` : ""}
+          {localizacao.precisao ? `\nPrecisão aproximada: ${localizacao.precisao} m` : ""}
         </Text>
       )}
       <TouchableOpacity style={styles.button} onPress={atualizarObra} disabled={salvando}>
