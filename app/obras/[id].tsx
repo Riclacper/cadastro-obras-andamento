@@ -3,6 +3,7 @@ import { View, Text, Image, ScrollView, Button, Alert, TouchableOpacity, Activit
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { apiFetch } from "@/utils/api";
 import Header from "../../components/Header";
+import { isoToDdmm } from "../../utils/formatDate";
 import { getAuthUser } from "@/utils/session";
 import type { Localizacao } from "@/utils/location";
 
@@ -148,7 +149,7 @@ export default function DetalheObra() {
 
       <Text style={styles.label}>Datas:</Text>
       <Text>
-        {obra.dataInicio.slice(0, 10)} até {obra.dataFim.slice(0, 10)}
+        {isoToDdmm(obra.dataInicio)} até {isoToDdmm(obra.dataFim)}
       </Text>
 
       <Text style={styles.label}>Status da obra:</Text>
@@ -173,7 +174,7 @@ export default function DetalheObra() {
         ) : (
           fiscalizacoes.map((f) => (
             <TouchableOpacity key={f._id} style={styles.fiscalCard} onPress={() => router.push(`/fiscalizacoes/${f._id}`)}>
-            <Text style={{ fontWeight: "bold" }}>{f.status} - {f.data.slice(0, 10)}</Text>
+            <Text style={{ fontWeight: "bold" }}>{f.status} - {isoToDdmm(f.data)}</Text>
             <Text style={styles.observationLabel}>Observações: <Text style={styles.observation}>{f.observacoes}</Text></Text>
             {f.foto ? <Image source={{ uri: f.foto }} style={styles.fiscImg} /> : null}
             {f.localizacao
