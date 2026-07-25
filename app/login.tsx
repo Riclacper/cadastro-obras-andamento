@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
   kicker: { color: colors.primaryDark, fontSize: 11, fontWeight: "800", letterSpacing: 1.5, textAlign: "center" },
   title: { color: colors.ink, fontSize: 30, fontWeight: "800", marginTop: 7, textAlign: "center" },
   subtitle: { color: colors.muted, fontSize: 14, lineHeight: 21, marginHorizontal: 16, marginTop: 9, textAlign: "center" },
-  form: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: 20, borderWidth: 1, marginTop: 30, padding: 20 },
+  form: { alignSelf: "center", backgroundColor: colors.surface, borderColor: colors.border, borderRadius: 20, borderWidth: 1, marginTop: 30, maxWidth: 560, padding: 20, width: "100%" },
   label: { color: colors.ink, fontSize: 12, fontWeight: "800", marginBottom: 7, marginTop: 4 },
   inputWrap: { alignItems: "center", borderColor: colors.border, borderRadius: 11, borderWidth: 1, flexDirection: "row", marginBottom: 15, paddingHorizontal: 13 },
   input: { color: colors.ink, flex: 1, fontSize: 15, paddingHorizontal: 10, paddingVertical: 13 },
