@@ -10,6 +10,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useRouter } from "expo-router";
@@ -21,6 +22,8 @@ const webInputStyle = Platform.OS === "web" ? ({ outlineStyle: "none" } as any) 
 
 export default function LoginScreen() {
   const router = useRouter();
+  const { width: viewportWidth } = useWindowDimensions();
+  const contentWidth = Math.min(560, Math.max(280, viewportWidth - 48));
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [loading, setLoading] = useState(false);
@@ -67,10 +70,10 @@ export default function LoginScreen() {
     >
       <Image source={require("../assets/images/logo.png")} style={styles.logo} resizeMode="contain" accessibilityLabel="Logo Cadastro de Obras" />
       <Text style={styles.kicker}>GESTÃO INTELIGENTE</Text>
-      <Text style={styles.title}>Cadastro de Obras</Text>
-      <Text style={styles.subtitle}>Acompanhe projetos, prazos e fiscalizações em um só lugar.</Text>
+      <Text style={[styles.title, { fontSize: viewportWidth < 480 ? 28 : 30, maxWidth: contentWidth }]}>Cadastro de Obras</Text>
+      <Text style={[styles.subtitle, { maxWidth: contentWidth }]}>Acompanhe projetos, prazos e fiscalizações em um só lugar.</Text>
 
-      <View style={styles.form}>
+      <View style={[styles.form, { width: contentWidth }]}>
         <Text style={styles.label}>E-mail</Text>
         <View style={[styles.inputWrap, focusedField === "email" && styles.inputWrapFocused]}>
           <FontAwesome name="envelope-o" size={16} color={colors.muted} />
@@ -121,7 +124,7 @@ const styles = StyleSheet.create({
   kicker: { color: colors.primaryDark, fontSize: 11, fontWeight: "800", letterSpacing: 1.5, textAlign: "center" },
   title: { color: colors.ink, fontSize: 30, fontWeight: "800", marginTop: 7, textAlign: "center" },
   subtitle: { color: colors.muted, fontSize: 14, lineHeight: 21, marginHorizontal: 16, marginTop: 9, textAlign: "center" },
-  form: { alignSelf: "center", backgroundColor: colors.surface, borderColor: colors.border, borderRadius: 20, borderWidth: 1, marginTop: 30, maxWidth: 560, padding: 20, width: "100%" },
+  form: { alignSelf: "center", backgroundColor: colors.surface, borderColor: colors.border, borderRadius: 20, borderWidth: 1, marginTop: 30, padding: 20 },
   label: { color: colors.ink, fontSize: 12, fontWeight: "800", marginBottom: 7, marginTop: 4 },
   inputWrap: { alignItems: "center", borderColor: colors.border, borderRadius: 11, borderWidth: 1, flexDirection: "row", marginBottom: 15, paddingHorizontal: 13 },
   inputWrapFocused: { borderColor: colors.primary, borderWidth: 2, shadowColor: colors.primary, shadowOpacity: 0.12, shadowRadius: 4 },
