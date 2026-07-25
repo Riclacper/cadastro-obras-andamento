@@ -72,6 +72,30 @@ O perfil Administrador gerencia obras, relatórios e usuários pela área **Equi
 - Envio de detalhes da obra por e-mail
 - Splash screen, navegação protegida e suporte a tema claro/escuro
 
+## Demonstração visual
+
+As telas abaixo mostram o fluxo atual do aplicativo no iPhone usando Expo Go:
+
+### Login
+
+![Tela de login](docs/screenshots/login.jpeg)
+
+### Dashboard do administrador
+
+![Dashboard do administrador](docs/screenshots/dashboard-admin.jpeg)
+
+### Cadastro de obra
+
+![Cadastro de obra](docs/screenshots/nova-obra.jpeg)
+
+### Cadastro de fiscalização
+
+![Cadastro de fiscalização](docs/screenshots/nova-fiscalizacao.jpeg)
+
+### Detalhes da obra
+
+![Detalhes da obra](docs/screenshots/detalhes-obra.jpeg)
+
 ## Estrutura principal
 
 ```text
