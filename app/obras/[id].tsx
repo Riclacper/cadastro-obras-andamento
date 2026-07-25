@@ -161,11 +161,12 @@ export default function DetalheObra() {
 
       <View style={styles.separador} />
 
-      <Text style={[styles.label, { fontSize: 18 }]}>Fiscalizações da obra</Text>
-      {fiscalizacoes.length === 0 ? (
-        <Text style={styles.emptyFiscalizacoes}>Nenhuma fiscalização cadastrada.</Text>
-      ) : (
-        fiscalizacoes.map((f) => (
+      <Text style={styles.fiscalizacoesTitle}>Fiscalizações da obra</Text>
+      <View style={styles.fiscalizacoesContent}>
+        {fiscalizacoes.length === 0 ? (
+          <Text style={styles.emptyFiscalizacoes}>Nenhuma fiscalização cadastrada.</Text>
+        ) : (
+          fiscalizacoes.map((f) => (
             <TouchableOpacity key={f._id} style={styles.fiscalCard} onPress={() => router.push(`/fiscalizacoes/${f._id}`)}>
             <Text style={{ fontWeight: "bold" }}>{f.status} - {f.data.slice(0, 10)}</Text>
             <Text style={styles.observationLabel}>Observações: <Text style={styles.observation}>{f.observacoes}</Text></Text>
@@ -174,10 +175,11 @@ export default function DetalheObra() {
               ? <Text style={{ fontSize: 12, color: "#555" }}>Lat: {f.localizacao.lat} | Long: {f.localizacao.long}</Text>
               : null}
           </TouchableOpacity>
-        ))
-      )}
+          ))
+        )}
+      </View>
 
-      <View style={styles.actionGrid}>
+      <View style={[styles.actionGrid, styles.actionsTopSpacing]}>
         {isAdmin && <TouchableOpacity style={[styles.actionButton, styles.blueAction]} onPress={() => router.push(`/obras/editar/${obra._id}`)}><Text style={styles.actionText}>Editar obra</Text></TouchableOpacity>}
         <TouchableOpacity style={[styles.actionButton, styles.greenAction]} onPress={() => router.push({ pathname: "/fiscalizacoes/nova", params: { obraId: obra._id } })}><Text style={styles.actionText}>Nova fiscalização</Text></TouchableOpacity>
       </View>
@@ -222,7 +224,10 @@ const styles = StyleSheet.create({
   statusBadge: { alignSelf: "flex-start", borderRadius: 9, marginTop: 2, paddingHorizontal: 10, paddingVertical: 6 },
   statusText: { fontSize: 13, fontWeight: "800" },
   fiscImg: { width: 80, height: 60, borderRadius: 6, marginTop: 6 },
-  emptyFiscalizacoes: { color: "#718096", marginBottom: 18, marginTop: 4 },
+  fiscalizacoesTitle: { color: "#183B56", fontSize: 18, fontWeight: "800", marginBottom: 12, marginTop: 4 },
+  fiscalizacoesContent: { marginBottom: 6 },
+  emptyFiscalizacoes: { color: "#718096", marginBottom: 8 },
+  actionsTopSpacing: { marginTop: 12 },
   actionGrid: { flexDirection: "row", gap: 10, marginBottom: 10, marginTop: 4 },
   actionButton: { alignItems: "center", borderRadius: 12, flex: 1, justifyContent: "center", minHeight: 52, paddingHorizontal: 8, paddingVertical: 10 },
   actionText: { color: "#fff", fontSize: 13, fontWeight: "800", textAlign: "center" },
