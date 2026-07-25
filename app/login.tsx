@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -62,7 +63,7 @@ export default function LoginScreen() {
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <View style={styles.brandMark}><FontAwesome name="building" size={28} color="#fff" /></View>
+      <Image source={require("../assets/images/logo.png")} style={styles.logo} resizeMode="contain" accessibilityLabel="Logo Cadastro de Obras" />
       <Text style={styles.kicker}>GESTÃO INTELIGENTE</Text>
       <Text style={styles.title}>Cadastro de Obras</Text>
       <Text style={styles.subtitle}>Acompanhe projetos, prazos e fiscalizações em um só lugar.</Text>
@@ -110,7 +111,7 @@ export default function LoginScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background, justifyContent: "center", padding: 24 },
-  brandMark: { alignItems: "center", alignSelf: "center", backgroundColor: colors.primaryDark, borderRadius: 18, height: 64, justifyContent: "center", marginBottom: 16, transform: [{ rotate: "-4deg" }], width: 64 },
+  logo: { alignSelf: "center", height: 112, marginBottom: 12, width: 112 },
   kicker: { color: colors.primaryDark, fontSize: 11, fontWeight: "800", letterSpacing: 1.5, textAlign: "center" },
   title: { color: colors.ink, fontSize: 30, fontWeight: "800", marginTop: 7, textAlign: "center" },
   subtitle: { color: colors.muted, fontSize: 14, lineHeight: 21, marginHorizontal: 16, marginTop: 9, textAlign: "center" },
